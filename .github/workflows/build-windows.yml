@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 300
     steps:
       - name: Git konfigurieren
-        run: git config --global core.autocrlf false
+        run: git config --global core.autocrlf input
 
       - uses: actions/checkout@v4
 
