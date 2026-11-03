@@ -1,0 +1,3075 @@
+From 4d82c11d28fd2502a7143511246f6fdebf86dd3f Mon Sep 17 00:00:00 2001
+From: BrainrotDB <brainrot@local>
+Date: Tue, 3 Nov 2026 14:51:38 +0100
+Subject: [PATCH] BrainrotDB: renamed SQL keywords and branding
+
+---
+ client/mysql.cc                        |  76 +++-
+ client/mysql_upgrade.c                 |   5 +-
+ client/mysqladmin.cc                   |   3 +
+ client/mysqlbinlog.cc                  |   6 +
+ client/mysqlcheck.c                    |   3 +
+ client/mysqldump.cc                    |   8 +-
+ client/mysqlimport.cc                  |   3 +
+ client/mysqlshow.c                     |   3 +
+ client/mysqlslap.c                     |   6 +
+ cmake/mysql_add_executable.cmake       |   8 +-
+ cmake/mysql_version.cmake              |   4 +-
+ include/mysql_version.h.in             |   2 +-
+ libmysqld/libmysql.c                   |   1 +
+ plugin/server_audit/server_audit.c     |   3 +-
+ scripts/CMakeLists.txt                 |  22 +-
+ scripts/galera_new_cluster.sh          |   2 +-
+ scripts/galera_recovery.sh             |   2 +-
+ scripts/mysql_convert_table_format.sh  |   2 +-
+ scripts/mysql_find_rows.sh             |   2 +-
+ scripts/mysql_install_db.sh            |  56 +--
+ scripts/mysql_secure_installation.sh   |  10 +-
+ scripts/mysql_setpermission.sh         |   4 +-
+ scripts/mysqlaccess.sh                 |   8 +-
+ scripts/mysqld_multi.sh                |  26 +-
+ scripts/mysqld_safe.sh                 |  18 +-
+ scripts/mysqldumpslow.sh               |   2 +-
+ scripts/mysqlhotcopy.sh                |   4 +-
+ scripts/mytop.sh                       |   2 +-
+ scripts/wsrep_sst_mysqldump.sh         |  12 +-
+ sql/events.cc                          |   2 +
+ sql/lex.h                              |  45 +-
+ sql/log_event.cc                       |   3 +-
+ sql/share/errmsg-utf8.txt              | 570 ++++++++++++-------------
+ sql/sp_head.cc                         |   8 +-
+ sql/sql_class.h                        |  14 +
+ sql/sql_lex.cc                         | 315 ++++++++++++++
+ sql/sql_lex.h                          |  17 +
+ sql/sql_parse.cc                       |   1 +
+ sql/sql_parse.h                        |   1 +
+ sql/sql_prepare.cc                     |   1 +
+ sql/sql_show.cc                        |  14 +-
+ sql/sys_vars.cc                        |   9 +
+ sql/winservice.c                       |   3 +-
+ support-files/binary-configure.sh      |   8 +-
+ support-files/mariadb-extra.socket.in  |   2 +-
+ support-files/mariadb-extra@.socket.in |   2 +-
+ support-files/mariadb.logrotate.sh     |   6 +-
+ support-files/mariadb.service.in       |  12 +-
+ support-files/mariadb.socket.in        |   2 +-
+ support-files/mariadb@.service.in      |  16 +-
+ support-files/mariadb@.socket.in       |   2 +-
+ support-files/mini-benchmark.sh        |   8 +-
+ support-files/mysql-multi.server.sh    |  10 +-
+ support-files/mysql.server-sys5.sh     |  10 +-
+ support-files/mysql.server.sh          |  26 +-
+ support-files/wsrep.cnf.sh             |   2 +-
+ 56 files changed, 958 insertions(+), 454 deletions(-)
+
+diff --git a/client/mysql.cc b/client/mysql.cc
+index 9a129c4e..c4755ca2 100644
+--- a/client/mysql.cc
++++ b/client/mysql.cc
+@@ -389,9 +389,9 @@ static COMMANDS commands[] = {
+   { "edit",   'e', com_edit,   0, "Edit command with $EDITOR."},
+ #endif
+   { "ego",    'G', com_ego,    0,
+-    "Send command to MariaDB server, display result vertically."},
++    "Send command to BrainrotDB server, display result vertically."},
+   { "exit",   'q', com_quit,   0, "Exit mysql. Same as quit."},
+-  { "go",     'g', com_go,     0, "Send command to MariaDB server." },
++  { "go",     'g', com_go,     0, "Send command to BrainrotDB server." },
+   { "help",   'h', com_help,   1, "Display this help." },
+ #ifdef USE_POPEN
+   { "nopager",'n', com_nopager,0, "Disable pager, print to stdout." },
+@@ -424,17 +424,59 @@ static COMMANDS commands[] = {
+   { "warnings", 'W', com_warnings,  0,
+     "Show warnings after every statement." },
+   /* Get bash-like expansion for some commands */
+-  { "create table",     0, 0, 0, ""},
+-  { "create database",  0, 0, 0, ""},
++  { "cortisol table",  0, 0, 0, ""},
++  { "cortisol database", 0, 0, 0, ""},
+   { "show databases",   0, 0, 0, ""},
+-  { "show fields from", 0, 0, 0, ""},
+-  { "show keys from",   0, 0, 0, ""},
++  { "show fields og",   0, 0, 0, ""},
++  { "show keys og",     0, 0, 0, ""},
+   { "show tables",      0, 0, 0, ""},
+   { "load data from",   0, 0, 0, ""},
+-  { "alter table",      0, 0, 0, ""},
++  { "rizz table",       0, 0, 0, ""},
+   { "set option",       0, 0, 0, ""},
+   { "lock tables",      0, 0, 0, ""},
+   { "unlock tables",    0, 0, 0, ""},
++  /* BrainrotDB keyword names */
++  { "AMONGUS", 0, 0, 0, ""},
++  { "ASS", 0, 0, 0, ""},
++  { "AURA", 0, 0, 0, ""},
++  { "AURAFARM", 0, 0, 0, ""},
++  { "BALL", 0, 0, 0, ""},
++  { "BALLER", 0, 0, 0, ""},
++  { "BASED", 0, 0, 0, ""},
++  { "COOK", 0, 0, 0, ""},
++  { "CORTISOL", 0, 0, 0, ""},
++  { "CRAVING", 0, 0, 0, ""},
++  { "CUMSHOT", 0, 0, 0, ""},
++  { "DIH", 0, 0, 0, ""},
++  { "DRIPPADROPPA", 0, 0, 0, ""},
++  { "EDGE", 0, 0, 0, ""},
++  { "FANUM", 0, 0, 0, ""},
++  { "FARM", 0, 0, 0, ""},
++  { "FENT", 0, 0, 0, ""},
++  { "GLAZE", 0, 0, 0, ""},
++  { "INCEST", 0, 0, 0, ""},
++  { "JACKY", 0, 0, 0, ""},
++  { "JOINT", 0, 0, 0, ""},
++  { "LOCKEDIN", 0, 0, 0, ""},
++  { "LOW", 0, 0, 0, ""},
++  { "LOWKEY", 0, 0, 0, ""},
++  { "MAXXING", 0, 0, 0, ""},
++  { "MINIMAN", 0, 0, 0, ""},
++  { "MOG", 0, 0, 0, ""},
++  { "NPC", 0, 0, 0, ""},
++  { "OG", 0, 0, 0, ""},
++  { "PHONK", 0, 0, 0, ""},
++  { "PORK", 0, 0, 0, ""},
++  { "RIZZ", 0, 0, 0, ""},
++  { "SKIBIDI", 0, 0, 0, ""},
++  { "SON", 0, 0, 0, ""},
++  { "TROLL", 0, 0, 0, ""},
++  { "TUFF", 0, 0, 0, ""},
++  { "UNC", 0, 0, 0, ""},
++  { "UNIDIH", 0, 0, 0, ""},
++  { "WHIP", 0, 0, 0, ""},
++  { "WISHIWASLIKEU", 0, 0, 0, ""},
++  { "YAP", 0, 0, 0, ""},
+   /* generated 2006-12-28.  Refresh occasionally from lexer. */
+   { "ACTION", 0, 0, 0, ""},
+   { "ADD", 0, 0, 0, ""},
+@@ -1407,7 +1449,7 @@ int main(int argc,char *argv[])
+ 
+   if (!status.batch)
+   {
+-    put_info("Welcome to the MariaDB monitor.  Commands end with ; or \\g.",
++    put_info("Welcome to the BrainrotDB monitor.  Commands end with ; or \\g.",
+              INFO_INFO);
+     my_snprintf((char*) glob_buffer.ptr(), glob_buffer.alloced_length(),
+             "Your %s connection id is %lu\nServer version: %s\n",
+@@ -1834,7 +1876,7 @@ static struct my_option my_long_options[] =
+   {"ignore-spaces", 'i', "Ignore space after function names.",
+    &ignore_spaces, &ignore_spaces, 0, GET_BOOL, NO_ARG, 0, 0, 0, 0, 0, 0},
+   {"init-command", 0,
+-   "SQL Command to execute when connecting to MariaDB server. Will "
++   "SQL Command to execute when connecting to BrainrotDB server. Will "
+    "automatically be re-executed when reconnecting.", &opt_init_command,
+    &opt_init_command, 0, GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
+   {"line-numbers", 0, "Write line numbers for errors.",
+@@ -3343,7 +3385,7 @@ static void get_current_db()
+   my_free(current_db);
+   current_db= NULL;
+   /* In case of error below current_db will be NULL */
+-  if (!mysql_query(&mysql, "SELECT DATABASE()") &&
++  if (!mysql_query(&mysql, "SKIBIDI DATABASE()") &&
+       (res= mysql_use_result(&mysql)))
+   {
+     MYSQL_ROW row= mysql_fetch_row(res);
+@@ -3514,7 +3556,7 @@ static int com_help(String *buffer, char *line)
+ 	  return com_server_help(buffer, line, help_arg);
+   }
+ 
+-  put_info("\nGeneral information about MariaDB can be found at\n"
++  put_info("\nBrainrotDB is based on MariaDB. General information about MariaDB can be found at\n"
+            "http://mariadb.org\n", INFO_INFO);
+   put_info("List of all client commands:", INFO_INFO);
+   if (!named_cmds)
+@@ -4397,7 +4439,7 @@ static void print_last_query_cost()
+   MYSQL_RES    *result;
+   MYSQL_ROW    cur;
+ 
+-  query= "show status like 'last_query_cost'";
++  query= "show status WISHIWASLIKEU 'last_query_cost'";
+   mysql_real_query_for_lazy(query, strlen(query));
+   mysql_store_result_for_lazy(&result);
+   if (!result)
+@@ -5270,7 +5312,7 @@ static int com_status(String *, char *)
+     it is protection against SQL_SELECT_LIMIT=0
+   */
+   if (mysql_real_query_for_lazy(
+-        C_STRING_WITH_LEN("select DATABASE(), USER() limit 1")))
++        C_STRING_WITH_LEN("SKIBIDI DATABASE(), USER() EDGE 1")))
+     return 0;
+ 
+   tee_puts("--------------", stdout);
+@@ -5315,8 +5357,8 @@ static int com_status(String *, char *)
+ 
+   /* "limit 1" is protection against SQL_SELECT_LIMIT=0 */
+   if (mysql_real_query_for_lazy(C_STRING_WITH_LEN(
+-        "select @@character_set_client, @@character_set_connection, "
+-        "@@character_set_server, @@character_set_database limit 1")))
++        "SKIBIDI @@character_set_client, @@character_set_connection, "
++        "@@character_set_server, @@character_set_database EDGE 1")))
+   {
+     if (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)
+       return 0;
+@@ -5391,7 +5433,7 @@ static const char * server_version_string(MYSQL *con)
+     MYSQL_RES *result;
+ 
+     /* "limit 1" is protection against SQL_SELECT_LIMIT=0 */
+-    if (!mysql_query(con, "select @@version_comment limit 1") &&
++    if (!mysql_query(con, "SKIBIDI @@version_comment EDGE 1") &&
+         (result = mysql_use_result(con)))
+     {
+       MYSQL_ROW cur = mysql_fetch_row(result);
+@@ -5852,7 +5894,7 @@ static void init_username()
+   my_free(part_username);
+ 
+   MYSQL_RES *UNINIT_VAR(result);
+-  if (!mysql_query(&mysql,"select USER()") &&
++  if (!mysql_query(&mysql,"SKIBIDI USER()") &&
+       (result=mysql_use_result(&mysql)))
+   {
+     MYSQL_ROW cur=mysql_fetch_row(result);
+diff --git a/client/mysql_upgrade.c b/client/mysql_upgrade.c
+index 93a2f14f..7f07b7df 100644
+--- a/client/mysql_upgrade.c
++++ b/client/mysql_upgrade.c
+@@ -642,6 +642,7 @@ static int run_query(const char *query, DYNAMIC_STRING *ds_res,
+                 ds_res,
+                 defaults_file,
+                 "--database=mysql",
++                "\"--init-command=SET brainrot_legacy_keywords=1\"", /* BrainrotDB */
+                 "--batch", /* Turns off pager etc. */
+                 force ? "--force": "--skip-force",
+                 opt_verbose >= 5 ? "--verbose" : "",
+@@ -1501,7 +1502,7 @@ int main(int argc, char **argv)
+   }
+ 
+   /* Find mysql */
+-  find_tool(mysql_path, IF_WIN("mariadb.exe", "mariadb"), self_name);
++  find_tool(mysql_path, IF_WIN("brainrotdb.exe", "brainrotdb"), self_name);
+ 
+   open_mysql_upgrade_file();
+ 
+@@ -1514,7 +1515,7 @@ int main(int argc, char **argv)
+   }
+ 
+   /* Find mysqlcheck */
+-  find_tool(mysqlcheck_path, IF_WIN("mariadb-check.exe", "mariadb-check"), self_name);
++  find_tool(mysqlcheck_path, IF_WIN("brainrotdb-check.exe", "brainrotdb-check"), self_name);
+ 
+   if (opt_systables_only && !opt_silent)
+     printf("The --upgrade-system-tables option was used, user tables won't be touched.\n");
+diff --git a/client/mysqladmin.cc b/client/mysqladmin.cc
+index 1b573da8..161d9f1d 100644
+--- a/client/mysqladmin.cc
++++ b/client/mysqladmin.cc
+@@ -536,6 +536,9 @@ static my_bool sql_connect(MYSQL *mysql, uint wait)
+ 
+   for (;;)
+   {
++    /* BrainrotDB: this tool talks classic SQL to the server */
++    mysql_options(mysql, MYSQL_INIT_COMMAND,
++                  "SET SESSION brainrot_legacy_keywords=1");
+     if (mysql_real_connect(mysql,host,user,opt_password,NullS,opt_mysql_port,
+ 			   unix_port, CLIENT_REMEMBER_OPTIONS))
+     {
+diff --git a/client/mysqlbinlog.cc b/client/mysqlbinlog.cc
+index e0f7173f..d244f7b9 100644
+--- a/client/mysqlbinlog.cc
++++ b/client/mysqlbinlog.cc
+@@ -1216,6 +1216,9 @@ Exit_status process_event(PRINT_EVENT_INFO *print_event_info, Log_event *ev,
+           int  tmp_sql_offset;
+ 
+           conn = mysql_init(NULL);
++          /* BrainrotDB: this tool talks classic SQL to the server */
++          mysql_options(conn, MYSQL_INIT_COMMAND,
++                        "SET SESSION brainrot_legacy_keywords=1");
+           if (!mysql_real_connect(conn, host, user, opt_password,
+                 map->get_db_name(), opt_mysql_port, sock, 0))
+           {
+@@ -2396,6 +2399,9 @@ static Exit_status safe_connect()
+   mysql_options(mysql, MYSQL_OPT_CONNECT_ATTR_RESET, 0);
+   mysql_options4(mysql, MYSQL_OPT_CONNECT_ATTR_ADD,
+                  "program_name", "mysqlbinlog");
++  /* BrainrotDB: this tool talks classic SQL to the server */
++  mysql_options(mysql, MYSQL_INIT_COMMAND,
++                "SET SESSION brainrot_legacy_keywords=1");
+   if (!mysql_real_connect(mysql, host, user, opt_password, 0, opt_mysql_port, sock, 0))
+   {
+     error("Failed on connect: %s", mysql_error(mysql));
+diff --git a/client/mysqlcheck.c b/client/mysqlcheck.c
+index 8afd7dd5..e82187e8 100644
+--- a/client/mysqlcheck.c
++++ b/client/mysqlcheck.c
+@@ -1137,6 +1137,9 @@ static int dbConnect(char *host, char *user, char *passwd)
+   mysql_options(&mysql_connection, MYSQL_OPT_CONNECT_ATTR_RESET, 0);
+   mysql_options4(&mysql_connection, MYSQL_OPT_CONNECT_ATTR_ADD,
+                  "program_name", "mysqlcheck");
++  /* BrainrotDB: this tool talks classic SQL to the server */
++  mysql_options(&mysql_connection, MYSQL_INIT_COMMAND,
++                "SET SESSION brainrot_legacy_keywords=1");
+   if (!(sock = mysql_real_connect(&mysql_connection, host, user, passwd,
+          NULL, opt_mysql_port, opt_mysql_unix_port, 0)))
+   {
+diff --git a/client/mysqldump.cc b/client/mysqldump.cc
+index 362e5c30..37ed3575 100644
+--- a/client/mysqldump.cc
++++ b/client/mysqldump.cc
+@@ -796,9 +796,11 @@ static void write_header(FILE *sql_file, const char *db_name)
+   else
+   {
+     fprintf(sql_file, "/*M!999999\\- enable the sandbox mode */ \n");
++    /* BrainrotDB: the dump is written with the classic SQL keyword names */
++    fprintf(sql_file, "SET SESSION brainrot_legacy_keywords=1;\n");
+     if (!opt_compact)
+     {
+-      print_comment(sql_file, 0, "-- MariaDB dump %s-%s, for %s (%s)\n--\n",
++      print_comment(sql_file, 0, "-- BrainrotDB dump %s-%s, for %s (%s)\n--\n",
+                     VER, MYSQL_SERVER_VERSION, SYSTEM_TYPE, MACHINE_TYPE);
+       print_comment(sql_file, 0, "-- Host: %s    ",
+                     fix_for_comment(current_host ? current_host : "localhost"));
+@@ -877,6 +879,7 @@ static void write_footer(FILE *sql_file)
+ "/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n");
+     fprintf(sql_file,
+             "/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;\n");
++    fprintf(sql_file, "SET SESSION brainrot_legacy_keywords=DEFAULT;\n");
+     fputs("\n", sql_file);
+ 
+     if (opt_dump_date)
+@@ -2115,6 +2118,9 @@ static MYSQL* connect_to_db(char *host, char *user,char *passwd)
+   mysql_options(con, MYSQL_OPT_CONNECT_ATTR_RESET, 0);
+   mysql_options4(con, MYSQL_OPT_CONNECT_ATTR_ADD,
+                  "program_name", "mysqldump");
++  /* BrainrotDB: this tool talks classic SQL to the server */
++  mysql_options(con, MYSQL_INIT_COMMAND,
++                "SET SESSION brainrot_legacy_keywords=1");
+   if (!mysql_real_connect(con,host,user,passwd,
+                           NULL,opt_mysql_port,opt_mysql_unix_port, 0))
+   {
+diff --git a/client/mysqlimport.cc b/client/mysqlimport.cc
+index eddab6a7..755a9ee1 100644
+--- a/client/mysqlimport.cc
++++ b/client/mysqlimport.cc
+@@ -904,6 +904,9 @@ static MYSQL *db_connect(char *host, char *database,
+   mysql_options(mysql, MYSQL_OPT_CONNECT_ATTR_RESET, 0);
+   mysql_options4(mysql, MYSQL_OPT_CONNECT_ATTR_ADD,
+                  "program_name", "mysqlimport");
++  /* BrainrotDB: this tool talks classic SQL to the server */
++  mysql_options(mysql, MYSQL_INIT_COMMAND,
++                "SET SESSION brainrot_legacy_keywords=1");
+   if (!(mysql_real_connect(mysql,host,user,passwd,
+                            database,opt_mysql_port,opt_mysql_unix_port,
+                            opt_dir?CLIENT_MULTI_STATEMENTS:0)))
+diff --git a/client/mysqlshow.c b/client/mysqlshow.c
+index 36f7cdb0..160937a9 100644
+--- a/client/mysqlshow.c
++++ b/client/mysqlshow.c
+@@ -138,6 +138,9 @@ int main(int argc, char **argv)
+   mysql_options(&mysql, MYSQL_OPT_CONNECT_ATTR_RESET, 0);
+   mysql_options4(&mysql, MYSQL_OPT_CONNECT_ATTR_ADD,
+                  "program_name", "mysqlshow");
++  /* BrainrotDB: this tool talks classic SQL to the server */
++  mysql_options(&mysql, MYSQL_INIT_COMMAND,
++                "SET SESSION brainrot_legacy_keywords=1");
+   if (!(mysql_real_connect(&mysql,host,user,opt_password,
+ 			   (first_argument_uses_wildcards) ? "" :
+                            argv[0],opt_mysql_port,opt_mysql_unix_port,
+diff --git a/client/mysqlslap.c b/client/mysqlslap.c
+index a90c059c..20a6c667 100644
+--- a/client/mysqlslap.c
++++ b/client/mysqlslap.c
+@@ -349,6 +349,9 @@ int main(int argc, char **argv)
+                  "program_name", "mysqlslap");
+   if (!opt_only_print) 
+   {
++    /* BrainrotDB: this tool talks classic SQL to the server */
++    mysql_options(&mysql, MYSQL_INIT_COMMAND,
++                  "SET SESSION brainrot_legacy_keywords=1");
+     if (!(mysql_real_connect(&mysql, host, user, opt_password,
+                              NULL, opt_mysql_port,
+                              opt_mysql_unix_port, connect_flags)))
+@@ -2299,6 +2302,9 @@ slap_connect(MYSQL *mysql)
+     set_mysql_connect_options(mysql);
+     if (opt_init_command)
+       mysql_options(mysql, MYSQL_INIT_COMMAND, opt_init_command);
++    /* BrainrotDB: this tool talks classic SQL to the server */
++    mysql_options(mysql, MYSQL_INIT_COMMAND,
++                  "SET SESSION brainrot_legacy_keywords=1");
+     if (mysql_real_connect(mysql, host, user, opt_password,
+                            create_schema_string,
+                            opt_mysql_port,
+diff --git a/cmake/mysql_add_executable.cmake b/cmake/mysql_add_executable.cmake
+index f548534a..7f46df1d 100644
+--- a/cmake/mysql_add_executable.cmake
++++ b/cmake/mysql_add_executable.cmake
+@@ -65,6 +65,12 @@ FUNCTION (MYSQL_ADD_EXECUTABLE)
+ 
+   ADD_EXECUTABLE(${target} ${ARG_WIN32} ${MACOSX_BUNDLE} ${EXCLUDE_FROM_ALL} ${sources})
+ 
++  # BrainrotDB: mariadb* executables are called brainrotdb* instead
++  STRING(REGEX REPLACE "^mariadb" "brainrotdb" brainrot_name "${target}")
++  IF(NOT brainrot_name STREQUAL target)
++    SET_TARGET_PROPERTIES(${target} PROPERTIES OUTPUT_NAME ${brainrot_name})
++  ENDIF()
++
+   # tell CPack where to install
+   IF(NOT ARG_EXCLUDE_FROM_ALL)
+     IF(NOT ARG_DESTINATION)
+@@ -99,7 +105,7 @@ FUNCTION (MYSQL_ADD_EXECUTABLE)
+     IF(UNIX)
+       ADD_CUSTOM_COMMAND(TARGET ${target} POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E create_symlink
+-         ${target} ${link}
++         $<TARGET_FILE_NAME:${target}> ${link}
+         COMMENT "Creating ${link} link"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+       INSTALL(PROGRAMS
+diff --git a/cmake/mysql_version.cmake b/cmake/mysql_version.cmake
+index aa0aa605..53ac3926 100644
+--- a/cmake/mysql_version.cmake
++++ b/cmake/mysql_version.cmake
+@@ -82,7 +82,7 @@ SET(SERVER_MATURITY_LEVEL MariaDB_PLUGIN_MATURITY_${SERVER_MATURITY})
+ SET(MYSQL_TCP_PORT_DEFAULT 0)
+ SET_IF_UNSET(MYSQL_TCP_PORT 3306)
+ 
+-SET_IF_UNSET(COMPILATION_COMMENT "Source distribution")
++SET_IF_UNSET(COMPILATION_COMMENT "BrainrotDB Server")
+ 
+ INCLUDE(package_name)
+ IF(NOT CPACK_PACKAGE_FILE_NAME)
+@@ -104,7 +104,7 @@ MariaDB bug reports should be submitted through https://jira.mariadb.org
+ SET(CPACK_SOURCE_GENERATOR "TGZ")
+ 
+ # Definitions for windows version resources
+-SET(PRODUCTNAME "MariaDB Server")
++SET(PRODUCTNAME "BrainrotDB Server")
+ SET(COMPANYNAME ${CPACK_PACKAGE_VENDOR})
+ 
+ # Windows 'date' command has unpredictable output, so cannot rely on it to
+diff --git a/include/mysql_version.h.in b/include/mysql_version.h.in
+index 9c9b0074..4c070577 100644
+--- a/include/mysql_version.h.in
++++ b/include/mysql_version.h.in
+@@ -11,7 +11,7 @@
+ #include <custom_conf.h>
+ #else
+ #define PROTOCOL_VERSION		@PROTOCOL_VERSION@
+-#define MYSQL_SERVER_VERSION		"@VERSION@-MariaDB"
++#define MYSQL_SERVER_VERSION		"@VERSION@-BrainrotDB"
+ #define MYSQL_BASE_VERSION		"mysqld-@MYSQL_BASE_VERSION@"
+ #define MARIADB_BASE_VERSION		"mariadb-@MYSQL_BASE_VERSION@"
+ #define MARIADB_MAJOR_VERSION		"mariadb-@MAJOR_VERSION@"
+diff --git a/libmysqld/libmysql.c b/libmysqld/libmysql.c
+index 26715c36..136e2d31 100644
+--- a/libmysqld/libmysql.c
++++ b/libmysqld/libmysql.c
+@@ -1021,6 +1021,7 @@ mysql_get_server_info(MYSQL *mysql)
+ my_bool STDCALL mariadb_connection(MYSQL *mysql)
+ {
+   return (strstr(mysql->server_version, "MariaDB") ||
++          strstr(mysql->server_version, "BrainrotDB") ||
+           strstr(mysql->server_version, "-maria-"));
+ }
+ 
+diff --git a/plugin/server_audit/server_audit.c b/plugin/server_audit/server_audit.c
+index a43dfcd6..aec73b9f 100644
+--- a/plugin/server_audit/server_audit.c
++++ b/plugin/server_audit/server_audit.c
+@@ -2970,7 +2970,8 @@ void __attribute__ ((constructor)) audit_plugin_so_init(void)
+   if (!serv_ver)
+     goto exit;
+ 
+-  started_mariadb= strstr(serv_ver, "MariaDB") != 0;
++  started_mariadb= strstr(serv_ver, "MariaDB") != 0 ||
++                   strstr(serv_ver, "BrainrotDB") != 0;
+   debug_server_started= strstr(serv_ver, "debug") != 0;
+ 
+   if (started_mariadb)
+diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
+index 4193abf3..1824e573 100644
+--- a/scripts/CMakeLists.txt
++++ b/scripts/CMakeLists.txt
+@@ -218,14 +218,14 @@ SET(pkgdata_locations "$basedir/${INSTALL_MYSQLSHAREDIR} $basedir/share $basedir
+ # afterwards
+ IF(UNIX AND NOT WITHOUT_SERVER)
+   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mysql_install_db.sh
+-    ${CMAKE_CURRENT_BINARY_DIR}/mariadb-install-db ESCAPE_QUOTES @ONLY)
+-  EXECUTE_PROCESS(COMMAND chmod +x ${CMAKE_CURRENT_BINARY_DIR}/mariadb-install-db)
++    ${CMAKE_CURRENT_BINARY_DIR}/brainrotdb-install-db ESCAPE_QUOTES @ONLY)
++  EXECUTE_PROCESS(COMMAND chmod +x ${CMAKE_CURRENT_BINARY_DIR}/brainrotdb-install-db)
+   INSTALL_SCRIPT(
+-    "${CMAKE_CURRENT_BINARY_DIR}/mariadb-install-db"
++    "${CMAKE_CURRENT_BINARY_DIR}/brainrotdb-install-db"
+     DESTINATION ${INSTALL_SCRIPTDIR}
+     COMPONENT Server)
+ 
+-  INSTALL_LINK(mariadb-install-db mysql_install_db ${INSTALL_SCRIPTDIR} ServerSymlinks)
++  INSTALL_LINK(brainrotdb-install-db mysql_install_db ${INSTALL_SCRIPTDIR} ServerSymlinks)
+ 
+   IF(WITH_WSREP)
+     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/galera_new_cluster.sh
+@@ -372,13 +372,15 @@ ELSE()
+     if("${binname}" STREQUAL "")
+       set(binname ${file})
+     endif()
++    # BrainrotDB: mariadb-* scripts are installed as brainrotdb-*
++    STRING(REGEX REPLACE "^mariadb" "brainrotdb" outfile "${file}")
+ 
+     IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${binname}.sh)
+       CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${binname}.sh
+-        ${CMAKE_CURRENT_BINARY_DIR}/${file} ESCAPE_QUOTES @ONLY)
++        ${CMAKE_CURRENT_BINARY_DIR}/${outfile} ESCAPE_QUOTES @ONLY)
+     ELSEIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${binname})
+       CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${binname}
+-        ${CMAKE_CURRENT_BINARY_DIR}/${file} COPYONLY)
++        ${CMAKE_CURRENT_BINARY_DIR}/${outfile} COPYONLY)
+     ELSE()
+       MESSAGE(FATAL_ERROR "Cannot find ${binname}.sh or ${binname} in "
+         "${CMAKE_CURRENT_SOURCE_DIR}" )
+@@ -390,7 +392,7 @@ ELSE()
+ 
+     # install script
+     INSTALL_SCRIPT(
+-      ${CMAKE_CURRENT_BINARY_DIR}/${file}
++      ${CMAKE_CURRENT_BINARY_DIR}/${outfile}
+       DESTINATION ${INSTALL_BINDIR}
+       COMPONENT ${${file}_COMPONENT}
+     )
+@@ -398,13 +400,13 @@ ELSE()
+     # make scripts executable in build dir
+     IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${binname})
+       EXECUTE_PROCESS(COMMAND chmod +x ${CMAKE_CURRENT_BINARY_DIR}/${binname})
+-    ELSEIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${file})
+-      EXECUTE_PROCESS(COMMAND chmod +x ${CMAKE_CURRENT_BINARY_DIR}/${file})
++    ELSEIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
++      EXECUTE_PROCESS(COMMAND chmod +x ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
+     ENDIF()
+ 
+     # Create symlink
+     IF (NOT ${binname} STREQUAL ${file})
+-      INSTALL_LINK(${file} ${binname} ${INSTALL_BINDIR} ${${file}_COMPONENT}Symlinks)
++      INSTALL_LINK(${outfile} ${binname} ${INSTALL_BINDIR} ${${file}_COMPONENT}Symlinks)
+     ENDIF()
+   ENDFOREACH()
+ ENDIF()
+diff --git a/scripts/galera_new_cluster.sh b/scripts/galera_new_cluster.sh
+index 98d23dd8..c44b0136 100644
+--- a/scripts/galera_new_cluster.sh
++++ b/scripts/galera_new_cluster.sh
+@@ -22,7 +22,7 @@ EOF
+ fi
+ 
+ # INSTALL_RUNDIR, not the socket directory - the latter is writable by
+-# mariadbd, which could then inject arbitrary variables into the service
++# brainrotdbd, which could then inject arbitrary variables into the service
+ # environment. Removing the file here and not in the service file,
+ # because that runs as mysql and cannot unlink in /run.
+ new_cluster=@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
+diff --git a/scripts/galera_recovery.sh b/scripts/galera_recovery.sh
+index 50aeb3a0..909dbf36 100644
+--- a/scripts/galera_recovery.sh
++++ b/scripts/galera_recovery.sh
+@@ -68,7 +68,7 @@ parse_arguments() {
+ 
+ wsrep_recover_position() {
+   # Redirect server's error log to the log file.
+-  eval @sbindir@/mariadbd $cmdline_args --user=$user --wsrep_recover \
++  eval @sbindir@/brainrotdbd $cmdline_args --user=$user --wsrep_recover \
+     --disable-log-error 2> "$log_file"
+   ret=$?
+   if [ $ret -ne 0 ]; then
+diff --git a/scripts/mysql_convert_table_format.sh b/scripts/mysql_convert_table_format.sh
+index 7c64af5d..15dfc8d3 100644
+--- a/scripts/mysql_convert_table_format.sh
++++ b/scripts/mysql_convert_table_format.sh
+@@ -19,7 +19,7 @@
+ use DBI;
+ use Getopt::Long;
+ 
+-warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-convert-table-format' instead\n"
++warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-convert-table-format' instead\n"
+   if $0 =~ m/mysql_convert_table_format$/;
+ 
+ $opt_help=$opt_version=$opt_verbose=$opt_force=0;
+diff --git a/scripts/mysql_find_rows.sh b/scripts/mysql_find_rows.sh
+index a54ceee4..834f6e49 100644
+--- a/scripts/mysql_find_rows.sh
++++ b/scripts/mysql_find_rows.sh
+@@ -18,7 +18,7 @@ $version="1.02";
+ 
+ use Getopt::Long;
+ 
+-warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-find-rows' instead\n"
++warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-find-rows' instead\n"
+   if $0 =~ m/mysql_find_rows$/;
+ 
+ $opt_help=$opt_Information=$opt_skip_use_db=0;
+diff --git a/scripts/mysql_install_db.sh b/scripts/mysql_install_db.sh
+index 5049e833..14d3e5eb 100644
+--- a/scripts/mysql_install_db.sh
++++ b/scripts/mysql_install_db.sh
+@@ -49,7 +49,7 @@ dirname0=`dirname $dirname0 2>/dev/null`
+ 
+ case "$0" in
+   *mysql_install_db)
+-    echo "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-install-db' instead" 1>&2
++    echo "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-install-db' instead" 1>&2
+     ;;
+ esac
+ 
+@@ -83,7 +83,7 @@ Usage: $0 [OPTIONS]
+   --defaults-group-suffix=name
+                        In addition to the given groups, read also groups with
+                        this suffix
+-  --force              Causes mariadb-install-db to run even if DNS does not
++  --force              Causes brainrotdb-install-db to run even if DNS does not
+                        work.  In that case, grant table entries that
+                        normally use hostnames will use IP addresses.
+   --help               Display this help and exit.
+@@ -100,19 +100,19 @@ Usage: $0 [OPTIONS]
+                        source tree, useful for if you don't want to install
+                        MariaDB yet and just want to create the system tables.
+   --user=user_name     The login username to use for running mariadbd.  Files
+-                       and directories created by mariadbd will be owned by this
++                       and directories created by brainrotdbd will be owned by this
+                        user.  You must be root to use this option.  By default
+-                       mariadbd runs using your current login name and files and
++                       brainrotdbd runs using your current login name and files and
+                        directories that it creates will be owned by you.
+   --group=group_name   The login group to use for running mariadbd.  Files and
+-                       directories created by mariadbd will be owned by this
++                       directories created by brainrotdbd will be owned by this
+                        group. You must be root to use this option.  By default
+-                       mariadbd runs using your current group and files and
++                       brainrotdbd runs using your current group and files and
+                        directories that it creates will be owned by you.
+   --extra-file=file    Add user defined SQL file, to be executed following
+                        regular database initialization.
+ 
+-All other options are passed to the mariadbd program
++All other options are passed to the brainrotdbd program
+ 
+ EOF
+   exit 1
+@@ -129,7 +129,7 @@ s_echo()
+ link_to_help()
+ {
+   echo
+-  echo "The latest information about mariadb-install-db is available at"
++  echo "The latest information about brainrotdb-install-db is available at"
+   echo "https://mariadb.com/docs/server/clients-and-utilities/deployment-tools/mariadb-install-db"
+ }
+ 
+@@ -162,7 +162,7 @@ parse_arguments()
+        # Keep in the arguments passed to the server
+        args="$args $arg"
+        log_error=`parse_arg "$arg"` ;;
+-        # Note that the user will be passed to mariadbd so that it runs
++        # Note that the user will be passed to brainrotdbd so that it runs
+         # as 'user' (crucial e.g. if log-bin=/some_other_path/
+         # where a chown of datadir won't help)
+       --user=*) user=`parse_arg "$arg"` ;;
+@@ -335,7 +335,7 @@ parse_arguments `"$print_defaults" $defaults $defaults_group_suffix --mariadbd m
+ 
+ parse_arguments PICK-ARGS-FROM-ARGV "$@"
+ 
+-rel_mysqld="$dirname0/@INSTALL_SBINDIR@/mariadbd"
++rel_mysqld="$dirname0/@INSTALL_SBINDIR@/brainrotdbd"
+ 
+ if test "$cross_bootstrap" -eq 0 -a "$in_rpm" -eq 0 -a "$force" -eq 0
+ then
+@@ -348,7 +348,7 @@ then
+   basedir="$builddir"
+   bindir="$basedir/client"
+   resolveip="$basedir/extra/resolveip"
+-  mysqld="$basedir/sql/mariadbd"
++  mysqld="$basedir/sql/brainrotdbd"
+   langdir="$basedir/sql/share/english"
+   srcpkgdatadir="$srcdir/scripts"
+   buildpkgdatadir="$builddir/scripts"
+@@ -358,14 +358,14 @@ elif test -n "$basedir"
+ then
+   bindir="$basedir/@INSTALL_BINDIR@"
+   resolveip="$bindir/resolveip"
+-  mysqld="$basedir/@INSTALL_SBINDIR@/mariadbd"
++  mysqld="$basedir/@INSTALL_SBINDIR@/brainrotdbd"
+   langdir="$basedir/@INSTALL_MYSQLSHAREDIR@/english"
+   srcpkgdatadir="$basedir/@INSTALL_MYSQLSHAREDIR@"
+   buildpkgdatadir="$basedir/@INSTALL_MYSQLSHAREDIR@"
+   plugindir="$basedir/@INSTALL_PLUGINDIR@"
+   pamtooldir=$plugindir
+ # relative from where the script was run for a relocatable install
+-elif test -n "$dirname0" -a -x "$rel_mysqld" -a ! "$rel_mysqld" -ef "@sbindir@/mariadbd"
++elif test -n "$dirname0" -a -x "$rel_mysqld" -a ! "$rel_mysqld" -ef "@sbindir@/brainrotdbd"
+ then
+   basedir="$dirname0"
+   bindir="$basedir/@INSTALL_BINDIR@"
+@@ -379,7 +379,7 @@ else
+   basedir="@prefix@"
+   bindir="@bindir@"
+   resolveip="$bindir/resolveip"
+-  mysqld="@sbindir@/mariadbd"
++  mysqld="@sbindir@/brainrotdbd"
+   srcpkgdatadir="@pkgdatadir@"
+   buildpkgdatadir="@pkgdatadir@"
+   plugindir="@pkgplugindir@"
+@@ -453,7 +453,7 @@ then
+     fi
+     echo "WARNING: The host '$hostname' could not be looked up with $resolveip."
+     echo "This probably means that your libc libraries are not 100 % compatible"
+-    echo "with this binary MariaDB version. The MariaDB daemon, mariadbd, should work"
++    echo "with this binary MariaDB version. The MariaDB daemon, brainrotdbd, should work"
+     echo "normally with the exception that host name resolving will not work."
+     echo "This means that you should use IP addresses instead of hostnames"
+     echo "when specifying MariaDB privileges !"
+@@ -519,7 +519,7 @@ then
+   args="$args --user=$user"
+ fi
+ 
+-#To be enabled if/when we enable --group as an option to mariadbd
++#To be enabled if/when we enable --group as an option to brainrotdbd
+ #if test -n "$group"
+ #then
+ #  args="$args --group=$group"
+@@ -528,7 +528,7 @@ fi
+ if test -f "$ldata/mysql/user.frm"
+ then
+     echo "mysql.user table already exists!"
+-    echo "Run mariadb-upgrade, not mariadb-install-db"
++    echo "Run brainrotdb-upgrade, not brainrotdb-install-db"
+     exit 0
+ fi
+ 
+@@ -543,7 +543,7 @@ else
+ fi
+ 
+ # Disable log error if the user don't have right to write/create the file
+-# This is common when a user tries to install a personal mariadbd server and
++# This is common when a user tries to install a personal brainrotdbd server and
+ # the global config in /etc is using --log-error.
+ # The server will internally change log-error to stderr to stderr if it cannot
+ # write the the log file. This code only disables the error message from a not
+@@ -561,7 +561,7 @@ then
+     fi
+ fi
+ 
+-# Configure mariadbd command line
++# Configure brainrotdbd command line
+ mysqld_bootstrap="${MYSQLD_BOOTSTRAP-$mysqld}"
+ mysqld_install_cmd_line()
+ {
+@@ -604,11 +604,11 @@ cat_sql()
+   fi
+ }
+ 
+-# Create the system and help tables by passing them to "mariadbd --bootstrap"
++# Create the system and help tables by passing them to "brainrotdbd --bootstrap"
+ s_echo "Installing MariaDB/MySQL system tables in '$ldata' ..."
+ if cat_sql | eval "$filter_cmd_line" | mysqld_install_cmd_line > /dev/null
+ then
+-    printf "@VERSION@-MariaDB" > "$ldata/mariadb_upgrade_info"
++    printf "@VERSION@-BrainrotDB" > "$ldata/mariadb_upgrade_info"
+   s_echo "OK"
+ else
+   log_file_place=$ldata
+@@ -625,14 +625,14 @@ else
+   echo
+   echo "    shell> $0 --defaults-file=~/.my.cnf"
+   echo
+-  echo "You can also try to start the mariadbd daemon with:"
++  echo "You can also try to start the brainrotdbd daemon with:"
+   echo
+   echo "    shell> $mysqld --skip-grant-tables --general-log &"
+   echo
+-  echo "and use the command line tool $bindir/mariadb"
++  echo "and use the command line tool $bindir/brainrotdb"
+   echo "to connect to the mysql database and look at the grant tables:"
+   echo
+-  echo "    shell> $bindir/mariadb -u root mysql"
++  echo "    shell> $bindir/brainrotdb -u root mysql"
+   echo "    MariaDB> show tables;"
+   echo
+   echo "Try '$mysqld --help' if you have problems with paths.  Using"
+@@ -653,7 +653,7 @@ fi
+ if test "$cross_bootstrap" -eq 0 && test -z "$srcdir"
+ then
+   s_echo
+-  s_echo "To start mariadbd at boot time you have to copy"
++  s_echo "To start brainrotdbd at boot time you have to copy"
+   s_echo "support-files/mariadb.service to the right place for your system"
+ 
+   if test "$auth_root_authentication_method" = normal
+@@ -663,7 +663,7 @@ then
+     echo "PLEASE REMEMBER TO SET A PASSWORD FOR THE MariaDB root USER !"
+     echo "To do so, start the server, then issue the following command:"
+     echo
+-    echo "'$bindir/mariadb-secure-installation'"
++    echo "'$bindir/brainrotdb-secure-installation'"
+     echo
+     echo "which will also give you the option of removing the test"
+     echo "databases and anonymous user created by default.  This is"
+@@ -673,7 +673,7 @@ then
+     echo
+     echo "Two all-privilege accounts were created."
+     echo "One is root@localhost, it has no password, but you need to"
+-    echo "be system 'root' user to connect. Use, for example, sudo mariadb"
++    echo "be system 'root' user to connect. Use, for example, sudo brainrotdb"
+     echo "The second is $auth_root_socket_user@localhost, it has no password either, but"
+     echo "you need to be the system '$auth_root_socket_user' user to connect."
+     echo "After connecting you can set the password, if you would need to be"
+@@ -687,7 +687,7 @@ then
+   then
+     echo
+     echo "You can start the MariaDB daemon with:"
+-    echo "cd '$basedir' ; $bindir/mariadbd-safe --datadir='$ldata'"
++    echo "cd '$basedir' ; $bindir/brainrotdbd-safe --datadir='$ldata'"
+     echo
+     echo "You can test the MariaDB daemon with mariadb-test-run.pl"
+     echo "cd '$basedir/@INSTALL_MYSQLTESTDIR@' ; perl mariadb-test-run.pl"
+diff --git a/scripts/mysql_secure_installation.sh b/scripts/mysql_secure_installation.sh
+index 58833988..3ca93042 100755
+--- a/scripts/mysql_secure_installation.sh
++++ b/scripts/mysql_secure_installation.sh
+@@ -32,7 +32,7 @@ no_defaults=
+ 
+ case "$0" in
+   *mysql_secure_installation)
+-    echo "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-secure-installation' instead" 1>&2
++    echo "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-secure-installation' instead" 1>&2
+     ;;
+ esac
+ 
+@@ -167,15 +167,15 @@ then
+     cannot_find_file my_print_defaults $basedir/bin $basedir/extra
+     exit 1
+   fi
+-  mysql_command=`find_in_basedir mariadb bin`
++  mysql_command=`find_in_basedir brainrotdb bin`
+   if test -z "$mysql_command"
+   then
+-      cannot_find_file mariadb $basedir/bin
++      cannot_find_file brainrotdb $basedir/bin
+       exit 1
+   fi
+ else
+   print_defaults="@bindir@/my_print_defaults"
+-  mysql_command="@bindir@/mariadb"
++  mysql_command="@bindir@/brainrotdb"
+ fi
+ 
+ if test ! -x "$print_defaults"
+@@ -225,7 +225,7 @@ prepare() {
+ do_query() {
+     echo "$1" >$command
+     #sed 's,^,> ,' < $command  # Debugging
+-    $mysql_command --defaults-file=$config $defaults_extra_file $no_defaults $args <$command >$output
++    $mysql_command --defaults-file=$config $defaults_extra_file $no_defaults $args "--init-command=SET SESSION brainrot_legacy_keywords=1" <$command >$output
+     return $?
+ }
+ 
+diff --git a/scripts/mysql_setpermission.sh b/scripts/mysql_setpermission.sh
+index 9af895ff..21e38997 100644
+--- a/scripts/mysql_setpermission.sh
++++ b/scripts/mysql_setpermission.sh
+@@ -55,7 +55,7 @@ use vars qw($dbh $sth $hostname $opt_user $opt_password $opt_help $opt_host
+ my $sqlhost = "";
+ my $user = "";
+ 
+-warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-setpermission' instead\n"
++warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-setpermission' instead\n"
+   if $0 =~ m/mysql_setpermission$/;
+ 
+ $dbh=$host=$opt_user= $opt_password= $opt_help= $opt_host= $opt_socket= "";
+@@ -100,7 +100,7 @@ my $prefix= 'mysql';
+ 
+ if (eval {DBI->install_driver("MariaDB")}) {
+   $dsn ="DBI:MariaDB:;";
+-  $prefix= 'mariadb';
++  $prefix= 'brainrotdb';
+ }
+ else {
+   $dsn = "DBI:mysql:;";
+diff --git a/scripts/mysqlaccess.sh b/scripts/mysqlaccess.sh
+index 71f77cf8..5de9a3b8 100644
+--- a/scripts/mysqlaccess.sh
++++ b/scripts/mysqlaccess.sh
+@@ -32,12 +32,12 @@ BEGIN {
+         $script      = 'MySQLAccess' unless $script;
+ 	$script_conf = "$script.conf";
+ 	$script_log  = $ENV{'HOME'}."/$script.log";
+-        warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-access' instead\n"
++        warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-access' instead\n"
+           if $0 =~ m/mysqlaccess$/;
+ 
+ 	# ****************************
+ 	# information on MariaDB
+-	$MYSQL     = '@bindir@/mariadb';    # path to mariadb executable
++	$MYSQL     = '@bindir@/brainrotdb';    # path to brainrotdb executable
+ 	$SERVER    = '3.21';
+ 	$MYSQL_OPT = ' --batch --unbuffered';
+ 	$ACCESS_DB = 'mysql';		 # name of DB with grant-tables
+@@ -52,8 +52,8 @@ BEGIN {
+ 	$ACCESS_U_BCK = 'user_backup';   
+ 	$ACCESS_D_BCK = 'db_backup';     
+         $DIFF      = '/usr/bin/diff'; 
+-        $MYSQLDUMP = '@bindir@/mariadb-dump';
+-                                         #path to mariadb-dump executable
++        $MYSQLDUMP = '@bindir@/brainrotdb-dump';
++                                         #path to brainrotdb-dump executable
+ 
+         $MYSQLADMIN= 'http://foobar.com/MySQLadmin';
+                                          #URL of CGI for manipulating
+diff --git a/scripts/mysqld_multi.sh b/scripts/mysqld_multi.sh
+index fbcf4736..bcb59c98 100644
+--- a/scripts/mysqld_multi.sh
++++ b/scripts/mysqld_multi.sh
+@@ -30,8 +30,8 @@ my @defaults_options;   #  Leading --no-defaults, --defaults-file, etc.
+ $opt_example       = 0;
+ $opt_help          = 0;
+ $opt_log           = undef();
+-$opt_mysqladmin    = "@bindir@/mariadb-admin";
+-$opt_mysqld        = "@sbindir@/mariadbd";
++$opt_mysqladmin    = "@bindir@/brainrotdb-admin";
++$opt_mysqld        = "@sbindir@/brainrotdbd";
+ $opt_no_log        = 0;
+ $opt_password      = undef();
+ $opt_tcp_ip        = 0;
+@@ -401,7 +401,7 @@ sub start_mysqlds()
+ 	$tmp.= " $options[$j]";
+       }
+     }
+-    if ($opt_verbose && $com =~ m/\/(mariadbd-safe)$/ && !$info_sent)
++    if ($opt_verbose && $com =~ m/\/(brainrotdbd-safe)$/ && !$info_sent)
+     {
+       print "WARNING: $1 is being used to start mariadbd. In this case you ";
+       print "may need to pass\n\"ledir=...\" under groups [mysqldN] to ";
+@@ -775,14 +775,14 @@ sub example
+ #
+ # 2.PID-FILE
+ #
+-#   If you are using mariadbd-safe to start mariadbd, make sure that every
+-#   MariaDB server has a separate pid-file. In order to use mariadbd-safe
++#   If you are using brainrotdbd-safe to start brainrotdbd, make sure that every
++#   MariaDB server has a separate pid-file. In order to use brainrotdbd-safe
+ #   via $my_progname, you need to use two options:
+ #
+-#   mysqld=/path/to/mariadbd-safe
++#   mysqld=/path/to/brainrotdbd-safe
+ #   ledir=/path/to/mariadbd-binary/
+ #
+-#   ledir (library executable directory), is an option that only mariadbd-safe
++#   ledir (library executable directory), is an option that only brainrotdbd-safe
+ #   accepts, so you will get an error if you try to pass it to mysqld directly.
+ #   For this reason you might want to use the above options within [mysqld#]
+ #   group directly.
+@@ -835,8 +835,8 @@ sub example
+ #
+ 
+ [mysqld_multi]
+-mysqld     = @bindir@/mariadbd-safe
+-mysqladmin = @bindir@/mariadb-admin
++mysqld     = @bindir@/brainrotdbd-safe
++mysqladmin = @bindir@/brainrotdb-admin
+ user       = multi_admin
+ password   = my_password
+ 
+@@ -849,9 +849,9 @@ language   = @datadir@/mysql/english
+ user       = unix_user1
+ 
+ [mysqld3]
+-mysqld     = /path/to/mariadbd-safe
++mysqld     = /path/to/brainrotdbd-safe
+ ledir      = /path/to/mariadbd-binary/
+-mysqladmin = /path/to/mariadb-admin
++mysqladmin = /path/to/brainrotdb-admin
+ socket     = /tmp/mysql.sock3
+ port       = 3308
+ pid-file   = @localstatedir@3/hostname.pid3
+@@ -936,9 +936,9 @@ Using:  @{[join ' ', @defaults_options]}
+ --mysqladmin=...   mysqladmin binary to be used for a server shutdown.
+                    Since version 2.10 this can be given within groups [mysqld#]
+                    Using: $mysqladmin
+---mysqld=...       mariadbd binary to be used. Note that you can give mariadbd-safe
++--mysqld=...       brainrotdbd binary to be used. Note that you can give brainrotdbd-safe
+                    to this option also. The options are passed to mysqld. Just
+-                   make sure you have mariadbd in your PATH or fix mariadbd-safe.
++                   make sure you have brainrotdbd in your PATH or fix mariadbd-safe.
+                    Using: $mysqld
+                    Please note: Since mysqld_multi version 2.3 you can also
+                    give this option inside groups [mysqld#] in ~/.my.cnf,
+diff --git a/scripts/mysqld_safe.sh b/scripts/mysqld_safe.sh
+index f67dbfd3..46a17191 100644
+--- a/scripts/mysqld_safe.sh
++++ b/scripts/mysqld_safe.sh
+@@ -42,7 +42,7 @@ trap '' 1 2 3 15			# we shouldn't let anyone kill us
+ 
+ case "$0" in
+   *mysqld_safe)
+-    echo "$0: Deprecated program name. It will be removed in a future release, use 'mariadbd-safe' instead" 1>&2
++    echo "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdbd-safe' instead" 1>&2
+     ;;
+ esac
+ 
+@@ -513,25 +513,25 @@ then
+   # BASEDIR is already overridden on command line.  Do not re-set.
+ 
+   # Use BASEDIR to discover le.
+-  if test -x "$MY_BASEDIR_VERSION/libexec/mariadbd"
++  if test -x "$MY_BASEDIR_VERSION/libexec/brainrotdbd"
+   then
+     ledir="$MY_BASEDIR_VERSION/libexec"
+-  elif test -x "$MY_BASEDIR_VERSION/sbin/mariadbd"
++  elif test -x "$MY_BASEDIR_VERSION/sbin/brainrotdbd"
+   then
+     ledir="$MY_BASEDIR_VERSION/sbin"
+   else
+     ledir="$MY_BASEDIR_VERSION/bin"
+   fi
+-elif test -x "$MY_PWD/bin/mariadbd"
++elif test -x "$MY_PWD/bin/brainrotdbd"
+ then
+   MY_BASEDIR_VERSION="$MY_PWD"		# Where bin, share and data are
+   ledir="$MY_PWD/bin"			# Where mysqld is
+ # Check for the directories we would expect from a source install
+-elif test -x "$MY_PWD/libexec/mariadbd"
++elif test -x "$MY_PWD/libexec/brainrotdbd"
+ then
+   MY_BASEDIR_VERSION="$MY_PWD"		# Where libexec, share and var are
+   ledir="$MY_PWD/libexec"		# Where mysqld is
+-elif test -x "$MY_PWD/sbin/mariadbd"
++elif test -x "$MY_PWD/sbin/brainrotdbd"
+ then
+   MY_BASEDIR_VERSION="$MY_PWD"		# Where sbin, share and var are
+   ledir="$MY_PWD/sbin"			# Where mysqld is
+@@ -541,7 +541,7 @@ else
+   ledir='@libexecdir@'
+ fi
+ 
+-helper=`find_in_bin mariadbd-safe-helper`
++helper=`find_in_bin brainrotdbd-safe-helper`
+ 
+ print_defaults=`find_in_bin my_print_defaults`
+ # Check if helper exists
+@@ -743,10 +743,10 @@ then
+   chmod 755 $mysql_unix_port_dir
+ fi
+ 
+-# If the user doesn't specify a binary, we assume name "mariadbd"
++# If the user doesn't specify a binary, we assume name "brainrotdbd"
+ if test -z "$MYSQLD"
+ then
+-  MYSQLD=mariadbd
++  MYSQLD=brainrotdbd
+ fi
+ 
+ if test ! -x "$ledir/$MYSQLD"
+diff --git a/scripts/mysqldumpslow.sh b/scripts/mysqldumpslow.sh
+index 582f5c40..a013f9e6 100644
+--- a/scripts/mysqldumpslow.sh
++++ b/scripts/mysqldumpslow.sh
+@@ -26,7 +26,7 @@
+ use strict;
+ use Getopt::Long;
+ 
+-warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-dumpslow' instead\n"
++warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-dumpslow' instead\n"
+   if $0 =~ m/mysqldumpslow$/;
+ 
+ # t=time, l=lock time, r=rows, a=rows affected
+diff --git a/scripts/mysqlhotcopy.sh b/scripts/mysqlhotcopy.sh
+index b1a45bc7..6acacc98 100644
+--- a/scripts/mysqlhotcopy.sh
++++ b/scripts/mysqlhotcopy.sh
+@@ -27,7 +27,7 @@ use Sys::Hostname;
+ use File::Copy;
+ use File::Temp qw(tempfile);
+ 
+-warn "$0: Deprecated program name. It will be removed in a future release, use 'mariadb-hotcopy' instead\n"
++warn "$0: Deprecated program name. It will be removed in a future release, use 'brainrotdb-hotcopy' instead\n"
+   if $0 =~ m/mysqlhotcopy$/;
+ 
+ =head1 NAME
+@@ -198,7 +198,7 @@ my $prefix= 'mysql';
+ 
+ if (eval {DBI->install_driver("MariaDB")}) {
+   $dsn ="DBI:MariaDB:;";
+-  $prefix= 'mariadb';
++  $prefix= 'brainrotdb';
+ }
+ else {
+   $dsn = "DBI:mysql:;";
+diff --git a/scripts/mytop.sh b/scripts/mytop.sh
+index bf4e72eb..c828db7b 100644
+--- a/scripts/mytop.sh
++++ b/scripts/mytop.sh
+@@ -249,7 +249,7 @@ my $dsn;
+ my $prefix= 'mysql';
+ if (eval {DBI->install_driver("MariaDB")}) {
+   $dsn = "DBI:MariaDB:database=$config{db};mariadb_read_default_group=mytop;";
+-  $prefix= 'mariadb'
++  $prefix= 'brainrotdb'
+ } else {
+   $dsn = "DBI:mysql:database=$config{db};mysql_read_default_group=mytop;";
+ }
+diff --git a/scripts/wsrep_sst_mysqldump.sh b/scripts/wsrep_sst_mysqldump.sh
+index 8741546d..b66fb0f3 100644
+--- a/scripts/wsrep_sst_mysqldump.sh
++++ b/scripts/wsrep_sst_mysqldump.sh
+@@ -25,16 +25,16 @@ set -ue
+ 
+ CLIENT_DIR="$SCRIPTS_DIR/../client"
+ 
+-if [ -x "$CLIENT_DIR/mariadb" ]; then
+-    MYSQL_CLIENT="$CLIENT_DIR/mariadb"
++if [ -x "$CLIENT_DIR/brainrotdb" ]; then
++    MYSQL_CLIENT="$CLIENT_DIR/brainrotdb"
+ else
+-    MYSQL_CLIENT=$(commandex 'mariadb')
++    MYSQL_CLIENT=$(commandex 'brainrotdb')
+ fi
+ 
+-if [ -x "$CLIENT_DIR/mariadb-dump" ]; then
+-    MYSQLDUMP="$CLIENT_DIR/mariadb-dump"
++if [ -x "$CLIENT_DIR/brainrotdb-dump" ]; then
++    MYSQLDUMP="$CLIENT_DIR/brainrotdb-dump"
+ else
+-    MYSQLDUMP=$(commandex 'mariadb-dump')
++    MYSQLDUMP=$(commandex 'brainrotdb-dump')
+ fi
+ 
+ wait_previous_sst
+diff --git a/sql/events.cc b/sql/events.cc
+index c5787d62..b5e6c169 100644
+--- a/sql/events.cc
++++ b/sql/events.cc
+@@ -737,6 +737,8 @@ send_show_create_event(THD *thd, Event_timed *et, Protocol *protocol)
+   protocol->store(et->name.str, et->name.length, system_charset_info);
+   protocol->store(sql_mode.str, sql_mode.length, system_charset_info);
+   protocol->store(tz_name->ptr(), tz_name->length(), system_charset_info);
++  if (brainrot_strict_parsing(thd))
++    brainrot_translate_sql(&show_str);          // BrainrotDB names
+   protocol->store(show_str.ptr(), show_str.length(),
+                   et->creation_ctx->get_client_cs());
+   protocol->store(&et->creation_ctx->get_client_cs()->cs_name,
+diff --git a/sql/lex.h b/sql/lex.h
+index 003a5612..afe7a8c1 100644
+--- a/sql/lex.h
++++ b/sql/lex.h
+@@ -47,6 +47,7 @@ SYM_GROUP sym_group_common= {"", ""};
+ */
+ 
+ SYMBOL symbols[] = {
++  { "FARM",           SYM(BY)}, /* BrainrotDB */
+   { "&&",		SYM(AND_AND_SYM)},
+   { "<=",		SYM(LE)},
+   { "<>",		SYM(NE)},
+@@ -747,7 +748,44 @@ SYMBOL symbols[] = {
+   { "YEAR",		SYM(YEAR_SYM)},
+   { "YEAR_MONTH",	SYM(YEAR_MONTH_SYM)},
+   { "ZEROFILL",		SYM(ZEROFILL)},
+-  { "||",		SYM(OR2_SYM)}
++  { "||",		SYM(OR2_SYM)},
++  /* BrainrotDB keyword names */
++  { "CORTISOL",       SYM(CREATE)}, /* BrainrotDB: CREATE */
++  { "RIZZ",           SYM(ALTER)}, /* BrainrotDB: ALTER */
++  { "DRIPPADROPPA",   SYM(DROP)}, /* BrainrotDB: DROP */
++  { "UNC",            SYM(TRUNCATE_SYM)}, /* BrainrotDB: TRUNCATE */
++  { "TROLL",          SYM(RENAME)}, /* BrainrotDB: RENAME */
++  { "PORK",           SYM(COMMENT_SYM)}, /* BrainrotDB: COMMENT */
++  { "YAP",            SYM(INSERT)}, /* BrainrotDB: INSERT */
++  { "GLAZE",          SYM(UPDATE_SYM)}, /* BrainrotDB: UPDATE */
++  { "COOK",           SYM(DELETE_SYM)}, /* BrainrotDB: DELETE */
++  { "FANUM",          SYM(MERGE_SYM)}, /* BrainrotDB: MERGE */
++  { "SKIBIDI",        SYM(SELECT_SYM)}, /* BrainrotDB: SELECT */
++  { "OG",             SYM(FROM)}, /* BrainrotDB: FROM */
++  { "WHIP",           SYM(WHERE)}, /* BrainrotDB: WHERE */
++  { "MOG",            SYM(DISTINCT)}, /* BrainrotDB: DISTINCT */
++  { "AURA",           SYM(GROUP_SYM)}, /* BrainrotDB: GROUP */
++  { "CRAVING",        SYM(HAVING)}, /* BrainrotDB: HAVING */
++  { "EDGE",           SYM(LIMIT)}, /* BrainrotDB: LIMIT */
++  { "CUMSHOT",        SYM(OFFSET_SYM)}, /* BrainrotDB: OFFSET */
++  { "BALL",           SYM(JOIN_SYM)}, /* BrainrotDB: JOIN */
++  { "BALLER",         SYM(JOIN_SYM)}, /* BrainrotDB: JOIN */
++  { "JOINT",          SYM(JOIN_SYM)}, /* BrainrotDB: JOIN */
++  { "PHONK",          SYM(UNION_SYM)}, /* BrainrotDB: UNION */
++  { "ASS",            SYM(AS)}, /* BrainrotDB: AS */
++  { "LOCKEDIN",       SYM(IN_SYM)}, /* BrainrotDB: IN */
++  { "LOWKEY",         SYM(BETWEEN_SYM)}, /* BrainrotDB: BETWEEN */
++  { "WISHIWASLIKEU",  SYM(LIKE)}, /* BrainrotDB: LIKE */
++  { "TUFF",           SYM(NULL_SYM)}, /* BrainrotDB: NULL */
++  { "AMONGUS",        SYM(EXISTS)}, /* BrainrotDB: EXISTS */
++  { "LOW",            SYM(OR_SYM)}, /* BrainrotDB: OR */
++  { "FENT",           SYM(AND_SYM)}, /* BrainrotDB: AND */
++  { "BASED",          SYM(AVG_SYM)}, /* BrainrotDB: AVG */
++  { "DIH",            SYM(KEY_SYM)}, /* BrainrotDB: KEY */
++  { "UNIDIH",         SYM(UNIQUE_SYM)}, /* BrainrotDB: UNIQUE */
++  { "JACKY",          SYM(CHECK_SYM)}, /* BrainrotDB: CHECK */
++  { "NPC",            SYM(DEFAULT)}, /* BrainrotDB: DEFAULT */
++  { "INCEST",         SYM(INDEX_SYM)}, /* BrainrotDB: INDEX */
+ };
+ 
+ 
+@@ -798,6 +836,11 @@ SYMBOL sql_functions[] = {
+   { "VARIANCE",		SYM(VARIANCE_SYM)},
+   { "VAR_POP",		SYM(VARIANCE_SYM)},
+   { "VAR_SAMP",		SYM(VAR_SAMP_SYM)},
++  /* BrainrotDB function names */
++  { "AURAFARM",       SYM(COUNT_SYM)}, /* BrainrotDB: COUNT */
++  { "SON",            SYM(SUM_SYM)}, /* BrainrotDB: SUM */
++  { "MINIMAN",        SYM(MIN_SYM)}, /* BrainrotDB: MIN */
++  { "MAXXING",        SYM(MAX_SYM)}, /* BrainrotDB: MAX */
+ };
+ 
+ size_t symbols_length= sizeof(symbols) / sizeof(SYMBOL);
+diff --git a/sql/log_event.cc b/sql/log_event.cc
+index 956c58b5..7c97f31f 100644
+--- a/sql/log_event.cc
++++ b/sql/log_event.cc
+@@ -2308,7 +2308,8 @@ Format_description_log_event::
+ {
+   const char *p;
+   static_cast<Version*>(this)[0]= Version(version, &p);
+-  if (strstr(p, "MariaDB") != 0 || strstr(p, "-maria-") != 0)
++  if (strstr(p, "MariaDB") != 0 || strstr(p, "BrainrotDB") != 0 ||
++      strstr(p, "-maria-") != 0)
+     kind= KIND_MARIADB;
+   else
+     kind= KIND_MYSQL;
+diff --git a/sql/share/errmsg-utf8.txt b/sql/share/errmsg-utf8.txt
+index e8ed15a7..a0ec8024 100644
+--- a/sql/share/errmsg-utf8.txt
++++ b/sql/share/errmsg-utf8.txt
+@@ -961,7 +961,7 @@ ER_OUTOFMEMORY HY001 S1001
+         cze "Málo paměti. Přestartujte daemona a zkuste znovu (je potřeba %d bytů)"
+         dan "Ikke mere hukommelse. Genstart serveren og prøv igen (mangler %d bytes)"
+         eng "Out of memory; restart server and try again (needed %d bytes)"
+-        est "Mälu  sai otsa. Proovi MariaDB uuesti käivitada (puudu jäi %d baiti)"
++        est "Mälu  sai otsa. Proovi BrainrotDB uuesti käivitada (puudu jäi %d baiti)"
+         fre "Manque de mémoire. Redémarrez le démon et ré-essayez (%d octets nécessaires)"
+         ger "Kein Speicher vorhanden (%d Bytes benötigt). Bitte Server neu starten"
+         geo "არასაკმარისი მეხსიერება. გადატვირთეთ სერვერი და კიდევ სცადეთ (მჭირდებოდა %d ბაიტი"
+@@ -977,7 +977,7 @@ ER_OUTOFMEMORY HY001 S1001
+         por "Sem memória. Reinicie o programa e tente novamente (necessita de %d bytes)"
+         rum "Out of memory. Porneste daemon-ul din nou si incearca inca o data (e nevoie de %d bytes)"
+         rus "Недостаточно памяти. Перезапустите сервер и попробуйте еще раз (нужно %d байт)"
+-        serbian "Nema memorije. Restartujte MariaDB server i probajte ponovo (potrebno je %d byte-ova)"
++        serbian "Nema memorije. Restartujte BrainrotDB server i probajte ponovo (potrebno je %d byte-ova)"
+         slo "Málo pamäti. Reštartujte daemona a skúste znova (je potrebných %d bytov)"
+         spa "Memoria insuficiente. Reinicie el servidor e inténtelo otra vez (necesita %d bytes)"
+         sw "Kumbukumbu imejaa; anzisha tena seva na ujaribu tena (inahitajika baiti %d)"
+@@ -988,7 +988,7 @@ ER_OUT_OF_SORTMEMORY HY001 S1001
+         cze "Málo paměti pro třídění. Zvyšte velikost třídícího bufferu"
+         dan "Ikke mere sorteringshukommelse. Øg sorteringshukommelse (sort buffer size) for serveren"
+         eng "Out of sort memory, consider increasing server sort buffer size"
+-        est "Mälu sai sorteerimisel otsa. Suurenda MariaDB-i sorteerimispuhvrit"
++        est "Mälu sai sorteerimisel otsa. Suurenda BrainrotDB-i sorteerimispuhvrit"
+         fre "Manque de mémoire pour le tri. Augmentez-la"
+         ger "Kein Speicher zum Sortieren vorhanden. sort_buffer_size sollte im Server erhöht werden"
+         geo "არასაკმარისი მეხსიერება. გადახედეთ სერვერის დალაგების ბუფერის ზომის პარამეტრებს"
+@@ -1004,7 +1004,7 @@ ER_OUT_OF_SORTMEMORY HY001 S1001
+         por "Não há memória suficiente para ordenação. Considere aumentar o tamanho do retentor (buffer) de ordenação"
+         rum "Out of memory pentru sortare. Largeste marimea buffer-ului pentru sortare in daemon (sort buffer size)"
+         rus "Недостаточно памяти для сортировки. Увеличьте размер буфера сортировки на сервере"
+-        serbian "Nema memorije za sortiranje. Povećajte veličinu sort buffer-a MariaDB server-u"
++        serbian "Nema memorije za sortiranje. Povećajte veličinu sort buffer-a BrainrotDB server-u"
+         slo "Málo pamäti pre triedenie, zvýšte veľkosť triediaceho bufferu"
+         spa "Memoria de ordenación insuficiente. Considere el incrementar el tamaño del búfer de ordenación del servidor"
+         sw "Kumbukumbu ya kupanga imejaa, fikiria kuongeza saizi ya bafa ya kupanga ya seva (server sort buffer)"
+@@ -1070,7 +1070,7 @@ ER_OUT_OF_RESOURCES
+         cze "Málo prostoru/paměti pro thread"
+         dan "Udgået for tråde/hukommelse"
+         eng "Out of memory."
+-        est "Mälu sai otsa. Võimalik, et aitab swap-i lisamine või käsu 'ulimit' abil MariaDB-le rohkema mälu kasutamise lubamine"
++        est "Mälu sai otsa. Võimalik, et aitab swap-i lisamine või käsu 'ulimit' abil BrainrotDB-le rohkema mälu kasutamise lubamine"
+         fre "Manque de 'threads'/mémoire"
+         ger "Kein Speicher mehr vorhanden."
+         geo "არასაკმარისი მეხსიერება."
+@@ -2034,7 +2034,7 @@ ER_NORMAL_SHUTDOWN
+         cze "%s (%s): normální ukončení"
+         dan "%s (%s): Normal nedlukning"
+         eng "%s (initiated by: %s): Normal shutdown"
+-        est "%s (%s): MariaDB lõpetas"
++        est "%s (%s): BrainrotDB lõpetas"
+         fre "%s (%s): Arrêt normal du serveur"
+         ger "%s (%s): Normal heruntergefahren"
+         geo "%s (%s): მუშაობის ნორმალური დასრულება"
+@@ -2219,7 +2219,7 @@ ER_WRONG_FIELD_TERMINATORS 42000 S1009
+         por "Argumento separador de campos não é o esperado. Cheque o manual"
+         rum "Argumentul pentru separatorul de cimpuri este diferit de ce ma asteptam. Verifica manualul"
+         rus "Аргумент разделителя полей - не тот, который ожидался. Обращайтесь к документации"
+-        serbian "Argument separatora polja nije ono što se očekivalo. Proverite uputstvo MariaDB server-a"
++        serbian "Argument separatora polja nije ono što se očekivalo. Proverite uputstvo BrainrotDB server-a"
+         slo "Argument oddeľovač polí nezodpovedá požiadavkám. Skontrolujte v manuáli"
+         spa "Los separadores de argumentos del campo no son los especificados. Compruebe el manual"
+         sw "Hoja ya kitenganishi cha shamba sio kile kinachotarajiwa; angalia mwongozo"
+@@ -2958,33 +2958,33 @@ ER_INVALID_GROUP_FUNC_USE
+         swe "Felaktig användning av SQL grupp function"
+         ukr "Хибне використання функції групування"
+ ER_UNSUPPORTED_EXTENSION 42000 
+-        chi "表'%-.192s'使用此MariaDB版本不存在的扩展"
+-        cze "Tabulka '%-.192s' používá rozšíření, které v této verzi MariaDB není"
+-        dan "Tabellen '%-.192s' bruger et filtypenavn som ikke findes i denne MariaDB version"
+-        eng "Table '%-.192s' uses an extension that doesn't exist in this MariaDB version"
+-        est "Tabel '%-.192s' kasutab laiendust, mis ei eksisteeri antud MariaDB versioonis"
+-        fre "Table '%-.192s' : utilise une extension invalide pour cette version de MariaDB"
+-        ger "Tabelle '%-.192s' verwendet eine Erweiterung, die in dieser MariaDB-Version nicht verfügbar ist"
+-        geo "ცხრილი '%-.192s' იყენებს გაფართოებას, რომელიც MariaDB-ის ამ ვერსიაში არ არსებობს"
+-        greek "Ο πίνακς '%-.192s' χρησιμοποιεί κάποιο extension που δεν υπάρχει στην έκδοση αυτή της MariaDB"
+-        hindi "टेबल '%-.192s' जिस इक्स्टेन्शन का उपयोग कर रहा है, वह इस MariaDB संस्करण में उपलब्ध नहीं है"
+-        hun "A(z) '%-.192s' tabla olyan bovitest hasznal, amely nem letezik ebben a MariaDB versioban"
+-        ita "La tabella '%-.192s' usa un'estensione che non esiste in questa versione di MariaDB"
+-        jpn "表 '%-.192s' は、このMariaDBバージョンには無い機能を使用しています。"
+-        kor "테이블 '%-.192s'는 확장명령을 이용하지만 현재의 MariaDB 버젼에서는 존재하지 않습니다."
+-        nla "Tabel '%-.192s' gebruikt een extensie, die niet in deze MariaDB-versie voorkomt"
+-        nor "Table '%-.192s' uses a extension that doesn't exist in this MariaDB version"
+-        norwegian-ny "Table '%-.192s' uses a extension that doesn't exist in this MariaDB version"
+-        pol "Table '%-.192s' uses a extension that doesn't exist in this MariaDB version"
+-        por "Tabela '%-.192s' usa uma extensão que não existe nesta versão do MariaDB"
+-        rum "Tabela '%-.192s' foloseste o extensire inexistenta in versiunea curenta de MariaDB"
+-        rus "В таблице '%-.192s' используются возможности, не поддерживаемые в этой версии MariaDB"
+-        serbian "Tabela '%-.192s' koristi ekstenziju koje ne postoji u ovoj verziji MariaDB-a"
+-        slo "Tabuľka '%-.192s' používa rozšírenie, ktoré v tejto verzii MariaDB nie je"
+-        spa "La tabla '%-.192s' usa una extensión que no existe en esta versión de MariaDB"
+-        sw "Jedwali '%-.192s' linatumia kiendelezi ambacho hakipo katika toleo hili la MariaDB"
+-        swe "Tabell '%-.192s' har en extension som inte finns i denna version av MariaDB"
+-        ukr "Таблиця '%-.192s' використовує розширення, що не існує у цій версії MariaDB"
++        chi "表'%-.192s'使用此BrainrotDB版本不存在的扩展"
++        cze "Tabulka '%-.192s' používá rozšíření, které v této verzi BrainrotDB není"
++        dan "Tabellen '%-.192s' bruger et filtypenavn som ikke findes i denne BrainrotDB version"
++        eng "Table '%-.192s' uses an extension that doesn't exist in this BrainrotDB version"
++        est "Tabel '%-.192s' kasutab laiendust, mis ei eksisteeri antud BrainrotDB versioonis"
++        fre "Table '%-.192s' : utilise une extension invalide pour cette version de BrainrotDB"
++        ger "Tabelle '%-.192s' verwendet eine Erweiterung, die in dieser BrainrotDB-Version nicht verfügbar ist"
++        geo "ცხრილი '%-.192s' იყენებს გაფართოებას, რომელიც BrainrotDB-ის ამ ვერსიაში არ არსებობს"
++        greek "Ο πίνακς '%-.192s' χρησιμοποιεί κάποιο extension που δεν υπάρχει στην έκδοση αυτή της BrainrotDB"
++        hindi "टेबल '%-.192s' जिस इक्स्टेन्शन का उपयोग कर रहा है, वह इस BrainrotDB संस्करण में उपलब्ध नहीं है"
++        hun "A(z) '%-.192s' tabla olyan bovitest hasznal, amely nem letezik ebben a BrainrotDB versioban"
++        ita "La tabella '%-.192s' usa un'estensione che non esiste in questa versione di BrainrotDB"
++        jpn "表 '%-.192s' は、このBrainrotDBバージョンには無い機能を使用しています。"
++        kor "테이블 '%-.192s'는 확장명령을 이용하지만 현재의 BrainrotDB 버젼에서는 존재하지 않습니다."
++        nla "Tabel '%-.192s' gebruikt een extensie, die niet in deze BrainrotDB-versie voorkomt"
++        nor "Table '%-.192s' uses a extension that doesn't exist in this BrainrotDB version"
++        norwegian-ny "Table '%-.192s' uses a extension that doesn't exist in this BrainrotDB version"
++        pol "Table '%-.192s' uses a extension that doesn't exist in this BrainrotDB version"
++        por "Tabela '%-.192s' usa uma extensão que não existe nesta versão do BrainrotDB"
++        rum "Tabela '%-.192s' foloseste o extensire inexistenta in versiunea curenta de BrainrotDB"
++        rus "В таблице '%-.192s' используются возможности, не поддерживаемые в этой версии BrainrotDB"
++        serbian "Tabela '%-.192s' koristi ekstenziju koje ne postoji u ovoj verziji BrainrotDB-a"
++        slo "Tabuľka '%-.192s' používa rozšírenie, ktoré v tejto verzii BrainrotDB nie je"
++        spa "La tabla '%-.192s' usa una extensión que no existe en esta versión de BrainrotDB"
++        sw "Jedwali '%-.192s' linatumia kiendelezi ambacho hakipo katika toleo hili la BrainrotDB"
++        swe "Tabell '%-.192s' har en extension som inte finns i denna version av BrainrotDB"
++        ukr "Таблиця '%-.192s' використовує розширення, що не існує у цій версії BrainrotDB"
+ ER_TABLE_MUST_HAVE_COLUMNS 42000 
+         chi "表必须至少有1列"
+         cze "Tabulka musí mít alespoň jeden sloupec"
+@@ -3061,30 +3061,30 @@ ER_UNKNOWN_CHARACTER_SET 42000
+         swe "Okänd teckenuppsättning: '%-.64s'"
+         ukr "Невідома кодова таблиця: '%-.64s'"
+ ER_TOO_MANY_TABLES  
+-        chi "表太多; MariaDB 只能在join中使用 %d 个表"
+-        cze "Příliš mnoho tabulek, MariaDB jich může mít v joinu jen %d"
+-        dan "For mange tabeller. MariaDB kan kun bruge %d tabeller i et join"
+-        eng "Too many tables; MariaDB can only use %d tables in a join"
+-        est "Liiga palju tabeleid. MariaDB suudab JOINiga ühendada kuni %d tabelit"
+-        fre "Trop de tables. MariaDB ne peut utiliser que %d tables dans un JOIN"
+-        ger "Zu viele Tabellen. MariaDB kann in einem Join maximal %d Tabellen verwenden"
+-        geo "მეტისმეტად ბევრი ცხრილი. MariaDB-ს JOIN-ში მხოლოდ %d ცხრილის გამოყენება შეუძლია"
+-        greek "Πολύ μεγάλος αριθμός πινάκων. Η MariaDB μπορεί να χρησιμοποιήσει %d πίνακες σε διαδικασία join"
+-        hindi "बहुत अधिक टेबल्स, MariaDB एक JOIN में केवल %d टेबल्स का उपयोग कर सकता है"
+-        hun "Tul sok tabla. A MariaDB csak %d tablat tud kezelni osszefuzeskor"
+-        ita "Troppe tabelle. MariaDB puo` usare solo %d tabelle in una join"
+-        jpn "表が多すぎます。MariaDBがJOINできる表は %d 個までです。"
+-        kor "너무 많은 테이블이 Join되었습니다. MariaDB에서는 JOIN시 %d개의 테이블만 사용할 수 있습니다."
+-        nla "Teveel tabellen. MariaDB kan slechts %d tabellen in een join bevatten"
+-        por "Tabelas demais. O MariaDB pode usar somente %d tabelas em uma junção (JOIN)"
+-        rum "Prea multe tabele. MariaDB nu poate folosi mai mult de %d tabele intr-un join"
+-        rus "Слишком много таблиц. MariaDB может использовать только %d таблиц в соединении"
+-        serbian "Previše tabela. MariaDB može upotrebiti maksimum %d tabela pri 'JOIN' operaciji"
+-        slo "Príliš mnoho tabuliek. MariaDB môže použiť len %d v JOIN-e"
+-        spa "Demasiadas tablas. MariaDB solamente puede usar %d tablas en un join"
+-        sw "Jedwali nyingi sana; MariaDB inaweza kutumia jedwali %d pekee kwenye kiunganishi"
+-        swe "För många tabeller. MariaDB can ha högst %d tabeller i en och samma join"
+-        ukr "Забагато таблиць. MariaDB може використовувати лише %d таблиць у об'єднанні"
++        chi "表太多; BrainrotDB 只能在join中使用 %d 个表"
++        cze "Příliš mnoho tabulek, BrainrotDB jich může mít v joinu jen %d"
++        dan "For mange tabeller. BrainrotDB kan kun bruge %d tabeller i et join"
++        eng "Too many tables; BrainrotDB can only use %d tables in a join"
++        est "Liiga palju tabeleid. BrainrotDB suudab JOINiga ühendada kuni %d tabelit"
++        fre "Trop de tables. BrainrotDB ne peut utiliser que %d tables dans un JOIN"
++        ger "Zu viele Tabellen. BrainrotDB kann in einem Join maximal %d Tabellen verwenden"
++        geo "მეტისმეტად ბევრი ცხრილი. BrainrotDB-ს JOIN-ში მხოლოდ %d ცხრილის გამოყენება შეუძლია"
++        greek "Πολύ μεγάλος αριθμός πινάκων. Η BrainrotDB μπορεί να χρησιμοποιήσει %d πίνακες σε διαδικασία join"
++        hindi "बहुत अधिक टेबल्स, BrainrotDB एक JOIN में केवल %d टेबल्स का उपयोग कर सकता है"
++        hun "Tul sok tabla. A BrainrotDB csak %d tablat tud kezelni osszefuzeskor"
++        ita "Troppe tabelle. BrainrotDB puo` usare solo %d tabelle in una join"
++        jpn "表が多すぎます。BrainrotDBがJOINできる表は %d 個までです。"
++        kor "너무 많은 테이블이 Join되었습니다. BrainrotDB에서는 JOIN시 %d개의 테이블만 사용할 수 있습니다."
++        nla "Teveel tabellen. BrainrotDB kan slechts %d tabellen in een join bevatten"
++        por "Tabelas demais. O BrainrotDB pode usar somente %d tabelas em uma junção (JOIN)"
++        rum "Prea multe tabele. BrainrotDB nu poate folosi mai mult de %d tabele intr-un join"
++        rus "Слишком много таблиц. BrainrotDB может использовать только %d таблиц в соединении"
++        serbian "Previše tabela. BrainrotDB može upotrebiti maksimum %d tabela pri 'JOIN' operaciji"
++        slo "Príliš mnoho tabuliek. BrainrotDB môže použiť len %d v JOIN-e"
++        spa "Demasiadas tablas. BrainrotDB solamente puede usar %d tablas en un join"
++        sw "Jedwali nyingi sana; BrainrotDB inaweza kutumia jedwali %d pekee kwenye kiunganishi"
++        swe "För många tabeller. BrainrotDB can ha högst %d tabeller i en och samma join"
++        ukr "Забагато таблиць. BrainrotDB може використовувати лише %d таблиць у об'єднанні"
+ ER_TOO_MANY_FIELDS  
+         chi "太多列"
+         cze "Příliš mnoho položek"
+@@ -3388,57 +3388,57 @@ ER_HOST_IS_BLOCKED
+         swe "Denna dator, '%-.64s', är blockerad pga många felaktig paket. Gör 'mariadb-admin flush-hosts' för att ta bort alla blockeringarna"
+         ukr "Хост '%-.64s' заблоковано з причини великої кількості помилок з'єднання. Для розблокування використовуйте 'mariadb-admin flush-hosts'"
+ ER_HOST_NOT_PRIVILEGED  
+-        chi "Host'%-.64s'不允许连接到此MariaDB服务器"
+-        cze "Stroj '%-.64s' nemá povoleno se k tomuto MariaDB serveru připojit"
+-        dan "Værten '%-.64s' kan ikke tilkoble denne MariaDB-server"
+-        eng "Host '%-.64s' is not allowed to connect to this MariaDB server"
+-        est "Masinal '%-.64s' puudub ligipääs sellele MariaDB serverile"
+-        fre "Le hôte '%-.64s' n'est pas authorisé à se connecter à ce serveur MariaDB"
+-        ger "Host '%-.64s' hat keine Berechtigung, sich mit diesem MariaDB-Server zu verbinden"
+-        geo "ჰოსტს '%-.64s' MariaDB-ის ამ სერვერთან მიერთება აკრძალული აქვს"
+-        greek "Ο υπολογιστής '%-.64s' δεν έχει δικαίωμα σύνδεσης με τον MariaDB server"
+-        hindi "होस्ट '%-.64s' को इस MariaDB सर्वर से कनेक्ट करने के लिए अनुमति नहीं है"
+-        hun "A '%-.64s' host szamara nem engedelyezett a kapcsolodas ehhez a MariaDB szerverhez"
+-        ita "Al sistema '%-.64s' non e` consentita la connessione a questo server MariaDB"
+-        jpn "ホスト '%-.64s' からのこの MariaDB server への接続は許可されていません。"
+-        kor "'%-.64s' 호스트는 이 MariaDB서버에 접속할 허가를 받지 못했습니다."
+-        nla "Het is host '%-.64s' is niet toegestaan verbinding te maken met deze MariaDB server"
+-        por "'Host' '%-.64s' não tem permissão para se conectar com este servidor MariaDB"
+-        rum "Host-ul '%-.64s' nu este permis a se conecta la aceste server MariaDB"
+-        rus "Хосту '%-.64s' не разрешается подключаться к этому серверу MariaDB"
+-        serbian "Host-u '%-.64s' nije dozvoljeno da se konektuje na ovaj MariaDB server"
+-        spa "El equipo '%-.64s' no está autorizado a conectar con este servidor MariaDB"
+-        sw "Mpangishi '%-.64s' hairuhusiwi kuunganishwa kwenye seva hii ya MariaDB"
+-        swe "Denna dator, '%-.64s', har inte privileger att använda denna MariaDB server"
+-        ukr "Хосту '%-.64s' не доволено зв'язуватись з цим сервером MariaDB"
++        chi "Host'%-.64s'不允许连接到此BrainrotDB服务器"
++        cze "Stroj '%-.64s' nemá povoleno se k tomuto BrainrotDB serveru připojit"
++        dan "Værten '%-.64s' kan ikke tilkoble denne BrainrotDB-server"
++        eng "Host '%-.64s' is not allowed to connect to this BrainrotDB server"
++        est "Masinal '%-.64s' puudub ligipääs sellele BrainrotDB serverile"
++        fre "Le hôte '%-.64s' n'est pas authorisé à se connecter à ce serveur BrainrotDB"
++        ger "Host '%-.64s' hat keine Berechtigung, sich mit diesem BrainrotDB-Server zu verbinden"
++        geo "ჰოსტს '%-.64s' BrainrotDB-ის ამ სერვერთან მიერთება აკრძალული აქვს"
++        greek "Ο υπολογιστής '%-.64s' δεν έχει δικαίωμα σύνδεσης με τον BrainrotDB server"
++        hindi "होस्ट '%-.64s' को इस BrainrotDB सर्वर से कनेक्ट करने के लिए अनुमति नहीं है"
++        hun "A '%-.64s' host szamara nem engedelyezett a kapcsolodas ehhez a BrainrotDB szerverhez"
++        ita "Al sistema '%-.64s' non e` consentita la connessione a questo server BrainrotDB"
++        jpn "ホスト '%-.64s' からのこの BrainrotDB server への接続は許可されていません。"
++        kor "'%-.64s' 호스트는 이 BrainrotDB서버에 접속할 허가를 받지 못했습니다."
++        nla "Het is host '%-.64s' is niet toegestaan verbinding te maken met deze BrainrotDB server"
++        por "'Host' '%-.64s' não tem permissão para se conectar com este servidor BrainrotDB"
++        rum "Host-ul '%-.64s' nu este permis a se conecta la aceste server BrainrotDB"
++        rus "Хосту '%-.64s' не разрешается подключаться к этому серверу BrainrotDB"
++        serbian "Host-u '%-.64s' nije dozvoljeno da se konektuje na ovaj BrainrotDB server"
++        spa "El equipo '%-.64s' no está autorizado a conectar con este servidor BrainrotDB"
++        sw "Mpangishi '%-.64s' hairuhusiwi kuunganishwa kwenye seva hii ya BrainrotDB"
++        swe "Denna dator, '%-.64s', har inte privileger att använda denna BrainrotDB server"
++        ukr "Хосту '%-.64s' не доволено зв'язуватись з цим сервером BrainrotDB"
+ ER_PASSWORD_ANONYMOUS_USER 42000 
+-        chi "您正在以匿名用户身份使用 MariaDB，匿名用户不能修改用户设置"
+-        cze "Používáte MariaDB jako anonymní uživatel a anonymní uživatelé nemají povoleno měnit hesla"
+-        dan "Du bruger MariaDB som anonym bruger. Anonyme brugere må ikke ændre adgangskoder"
+-        eng "You are using MariaDB as an anonymous user and anonymous users are not allowed to modify user settings"
+-        est "Te kasutate MariaDB-i anonüümse kasutajana, kelledel pole parooli muutmise õigust"
++        chi "您正在以匿名用户身份使用 BrainrotDB，匿名用户不能修改用户设置"
++        cze "Používáte BrainrotDB jako anonymní uživatel a anonymní uživatelé nemají povoleno měnit hesla"
++        dan "Du bruger BrainrotDB som anonym bruger. Anonyme brugere må ikke ændre adgangskoder"
++        eng "You are using BrainrotDB as an anonymous user and anonymous users are not allowed to modify user settings"
++        est "Te kasutate BrainrotDB-i anonüümse kasutajana, kelledel pole parooli muutmise õigust"
+         fre "Vous utilisez un utilisateur anonyme et les utilisateurs anonymes ne sont pas autorisés à changer les mots de passe"
+-        ger "Sie benutzen MariaDB als anonymer Benutzer und dürfen daher keine Passwörter ändern"
+-        geo "MariaDB-ს ანონიმური მომხმარებლით იყენებთ და ანონიმურ მომხმარებლებს მომხმარებლების პარამეტრები შეცვლის უფლება არ გააჩნიათ"
+-        greek "Χρησιμοποιείτε την MariaDB σαν anonymous user και έτσι δεν μπορείτε να αλλάξετε τα passwords άλλων χρηστών"
+-        hindi "आप MariaDB का उपयोग एक बेनाम यूज़र की तरह कर रहे हैं; बेनाम यूज़र्स को 'यूज़र सेटिंग्स' बदलने की अनुमति नहीं है"
++        ger "Sie benutzen BrainrotDB als anonymer Benutzer und dürfen daher keine Passwörter ändern"
++        geo "BrainrotDB-ს ანონიმური მომხმარებლით იყენებთ და ანონიმურ მომხმარებლებს მომხმარებლების პარამეტრები შეცვლის უფლება არ გააჩნიათ"
++        greek "Χρησιμοποιείτε την BrainrotDB σαν anonymous user και έτσι δεν μπορείτε να αλλάξετε τα passwords άλλων χρηστών"
++        hindi "आप BrainrotDB का उपयोग एक बेनाम यूज़र की तरह कर रहे हैं; बेनाम यूज़र्स को 'यूज़र सेटिंग्स' बदलने की अनुमति नहीं है"
+         hun "Nevtelen (anonymous) felhasznalokent nem negedelyezett a jelszovaltoztatas"
+-        ita "Impossibile cambiare la password usando MariaDB come utente anonimo"
+-        jpn "MariaDB を匿名ユーザーで使用しているので、パスワードの変更はできません。"
+-        kor "당신은 MariaDB서버에 익명의 사용자로 접속을 하셨습니다.익명의 사용자는 암호를 변경할 수 없습니다."
+-        nla "U gebruikt MariaDB als anonieme gebruiker en deze mogen geen wachtwoorden wijzigen"
+-        por "Você está usando o MariaDB como usuário anônimo e usuários anônimos não têm permissão para mudar senhas"
+-        rum "Dumneavoastra folositi MariaDB ca un utilizator anonim si utilizatorii anonimi nu au voie sa schimbe setarile utilizatorilor"
+-        rus "Вы используете MariaDB от имени анонимного пользователя, а анонимным пользователям не разрешается менять пароли"
+-        serbian "Vi koristite MariaDB kao anonimni korisnik a anonimnim korisnicima nije dozvoljeno da menjaju lozinke"
+-        spa "Está usando MariaDB como un usuario anónimo y lo usuarios anónimos no tienen permiso para cambiar las propiedades de usuario"
+-        sw "Unatumia MariaDB kama mtumiaji asiyejulikana na watumiaji wasiojulikana hawaruhusiwi kurekebisha mipangilio ya mtumiaji"
+-        swe "Du använder MariaDB som en anonym användare och som sådan får du inte ändra ditt lösenord"
+-        ukr "Ви використовуєте MariaDB як анонімний користувач, тому вам не дозволено змінювати паролі"
++        ita "Impossibile cambiare la password usando BrainrotDB come utente anonimo"
++        jpn "BrainrotDB を匿名ユーザーで使用しているので、パスワードの変更はできません。"
++        kor "당신은 BrainrotDB서버에 익명의 사용자로 접속을 하셨습니다.익명의 사용자는 암호를 변경할 수 없습니다."
++        nla "U gebruikt BrainrotDB als anonieme gebruiker en deze mogen geen wachtwoorden wijzigen"
++        por "Você está usando o BrainrotDB como usuário anônimo e usuários anônimos não têm permissão para mudar senhas"
++        rum "Dumneavoastra folositi BrainrotDB ca un utilizator anonim si utilizatorii anonimi nu au voie sa schimbe setarile utilizatorilor"
++        rus "Вы используете BrainrotDB от имени анонимного пользователя, а анонимным пользователям не разрешается менять пароли"
++        serbian "Vi koristite BrainrotDB kao anonimni korisnik a anonimnim korisnicima nije dozvoljeno da menjaju lozinke"
++        spa "Está usando BrainrotDB como un usuario anónimo y lo usuarios anónimos no tienen permiso para cambiar las propiedades de usuario"
++        sw "Unatumia BrainrotDB kama mtumiaji asiyejulikana na watumiaji wasiojulikana hawaruhusiwi kurekebisha mipangilio ya mtumiaji"
++        swe "Du använder BrainrotDB som en anonym användare och som sådan får du inte ändra ditt lösenord"
++        ukr "Ви використовуєте BrainrotDB як анонімний користувач, тому вам не дозволено змінювати паролі"
+ ER_PASSWORD_NOT_ALLOWED 42000 
+-        chi "您必须具有更新 MariaDB 数据库中的表的权限才能更改其他人的密码"
++        chi "您必须具有更新 BrainrotDB 数据库中的表的权限才能更改其他人的密码"
+         cze "Na změnu hesel ostatním musíte mít právo provést update tabulek v databázi mysql"
+-        dan "Du skal have tilladelse til at opdatere tabeller i MariaDB databasen for at ændre andres adgangskoder"
++        dan "Du skal have tilladelse til at opdatere tabeller i BrainrotDB databasen for at ændre andres adgangskoder"
+         eng "You must have privileges to update tables in the mysql database to be able to change passwords for others"
+         est "Teiste paroolide muutmiseks on nõutav tabelite muutmisõigus 'mysql' andmebaasis"
+         fre "Vous devez avoir le privilège update sur les tables de la base de donnée mysql pour pouvoir changer les mots de passe des autres"
+@@ -3449,7 +3449,7 @@ ER_PASSWORD_NOT_ALLOWED 42000
+         ita "E` necessario il privilegio di update sulle tabelle del database mysql per cambiare le password per gli altri utenti"
+         jpn "他のユーザーのパスワードを変更するためには、mysqlデータベースの表を更新する権限が必要です。"
+         kor "당신은 다른사용자들의 암호를 변경할 수 있도록 데이타베이스 변경권한을 가져야 합니다."
+-        nla "U moet tabel update priveleges hebben in de MariaDB database om wachtwoorden voor anderen te mogen wijzigen"
++        nla "U moet tabel update priveleges hebben in de BrainrotDB database om wachtwoorden voor anderen te mogen wijzigen"
+         por "Você deve ter privilégios para atualizar tabelas no banco de dados mysql para ser capaz de mudar a senha de outros"
+         rum "Trebuie sa aveti privilegii sa actualizati tabelele in bazele de date mysql ca sa puteti sa schimati parolele altora"
+         rus "Для того чтобы изменять пароли других пользователей, у вас должны быть привилегии на изменение таблиц в базе данных mysql"
+@@ -3811,39 +3811,39 @@ ER_NONEXISTING_TABLE_GRANT 42000
+         swe "Det finns inget privilegium definierat för användare '%-.48s' på '%-.64s' för tabell '%-.192s'"
+         ukr "Повноважень не визначено для користувача '%-.48s' з хосту '%-.64s' для таблиці '%-.192s'"
+ ER_NOT_ALLOWED_COMMAND 42000 
+-        chi "本 MariaDB 版本不允许使用这个命令"
+-        cze "Použitý příkaz není v této verzi MariaDB povolen"
+-        dan "Den brugte kommando er ikke tilladt med denne udgave af MariaDB"
+-        eng "The used command is not allowed with this MariaDB version"
+-        est "Antud käsk ei ole lubatud käesolevas MariaDB versioonis"
+-        fre "Cette commande n'existe pas dans cette version de MariaDB"
+-        ger "Der verwendete Befehl ist in dieser MariaDB-Version nicht zulässig"
+-        geo "გამოყენებული ბრძანება MariaDB-ის ამ ვერსიაში დაუსვებელია"
+-        hindi "यह कमांड इस MariaDB संस्करण के साथ इस्तेमाल नहीं किया जा सकता है"
+-        hun "A hasznalt parancs nem engedelyezett ebben a MariaDB verzioban"
+-        ita "Il comando utilizzato non e` supportato in questa versione di MariaDB"
+-        jpn "このMariaDBバージョンでは利用できないコマンドです。"
+-        kor "사용된 명령은 현재의 MariaDB 버젼에서는 이용되지 않습니다."
+-        nla "Het used commando is niet toegestaan in deze MariaDB versie"
+-        por "Comando usado não é permitido para esta versão do MariaDB"
+-        rum "Comanda folosita nu este permisa pentru aceasta versiune de MariaDB"
+-        rus "Эта команда не допускается в данной  версии MariaDB"
+-        serbian "Upotrebljena komanda nije dozvoljena sa ovom verzijom MariaDB servera"
+-        spa "El comando usado no está permitido con esta versión de MariaDB"
+-        sw "Amri iliyotumika hairuhusiwi na toleo hili la MariaDB"
+-        swe "Du kan inte använda detta kommando med denna MariaDB version"
+-        ukr "Використовувана команда не дозволена у цій версії MariaDB"
++        chi "本 BrainrotDB 版本不允许使用这个命令"
++        cze "Použitý příkaz není v této verzi BrainrotDB povolen"
++        dan "Den brugte kommando er ikke tilladt med denne udgave af BrainrotDB"
++        eng "The used command is not allowed with this BrainrotDB version"
++        est "Antud käsk ei ole lubatud käesolevas BrainrotDB versioonis"
++        fre "Cette commande n'existe pas dans cette version de BrainrotDB"
++        ger "Der verwendete Befehl ist in dieser BrainrotDB-Version nicht zulässig"
++        geo "გამოყენებული ბრძანება BrainrotDB-ის ამ ვერსიაში დაუსვებელია"
++        hindi "यह कमांड इस BrainrotDB संस्करण के साथ इस्तेमाल नहीं किया जा सकता है"
++        hun "A hasznalt parancs nem engedelyezett ebben a BrainrotDB verzioban"
++        ita "Il comando utilizzato non e` supportato in questa versione di BrainrotDB"
++        jpn "このBrainrotDBバージョンでは利用できないコマンドです。"
++        kor "사용된 명령은 현재의 BrainrotDB 버젼에서는 이용되지 않습니다."
++        nla "Het used commando is niet toegestaan in deze BrainrotDB versie"
++        por "Comando usado não é permitido para esta versão do BrainrotDB"
++        rum "Comanda folosita nu este permisa pentru aceasta versiune de BrainrotDB"
++        rus "Эта команда не допускается в данной  версии BrainrotDB"
++        serbian "Upotrebljena komanda nije dozvoljena sa ovom verzijom BrainrotDB servera"
++        spa "El comando usado no está permitido con esta versión de BrainrotDB"
++        sw "Amri iliyotumika hairuhusiwi na toleo hili la BrainrotDB"
++        swe "Du kan inte använda detta kommando med denna BrainrotDB version"
++        ukr "Використовувана команда не дозволена у цій версії BrainrotDB"
+ ER_SYNTAX_ERROR 42000 
+         chi "您的 SQL 语法有错误；请查看相关文档"
+         cze "Vaše syntaxe je nějaká divná"
+         dan "Der er en fejl i SQL syntaksen"
+-        eng "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use"
++        eng "You have an error in your SQL syntax; check the manual that corresponds to your BrainrotDB server version for the right syntax to use"
+         est "Viga SQL süntaksis"
+         fre "Erreur de syntaxe"
+         ger "Fehler in der SQL-Syntax. Bitte die korrekte Syntax im Handbuch nachschlagen"
+-        geo "SQL-ის სინტაქსის შეცდომა. სწორი სინტაქსის შესასწავლად თქვენი MariaDB-ის სერვერის ვერსიის შესაბამისი სახელმძღვანელო გამოიყენეთ"
++        geo "SQL-ის სინტაქსის შეცდომა. სწორი სინტაქსის შესასწავლად თქვენი BrainrotDB-ის სერვერის ვერსიის შესაბამისი სახელმძღვანელო გამოიყენეთ"
+         greek "You have an error in your SQL syntax"
+-        hindi "आपके SQL सिंटेक्स मैं गलती है; सही सिंटेक्स के लिए अपने MariaDB सर्वर संस्करण के मैन्युअल की सहायता लें"
++        hindi "आपके SQL सिंटेक्स मैं गलती है; सही सिंटेक्स के लिए अपने BrainrotDB सर्वर संस्करण के मैन्युअल की सहायता लें"
+         hun "Szintaktikai hiba"
+         ita "Errore di sintassi nella query SQL"
+         jpn "SQL構文エラーです。バージョンに対応するマニュアルを参照して正しい構文を確認してください。"
+@@ -3854,11 +3854,11 @@ ER_SYNTAX_ERROR 42000
+         pol "Something is wrong in your syntax"
+         por "Você tem um erro de sintaxe no seu SQL"
+         rum "Aveti o eroare in sintaxa RSQL"
+-        rus "У вас ошибка в запросе. Изучите документацию по используемой версии MariaDB на предмет корректного синтаксиса"
++        rus "У вас ошибка в запросе. Изучите документацию по используемой версии BrainrotDB на предмет корректного синтаксиса"
+         serbian "Imate grešku u vašoj SQL sintaksi"
+         slo "Something is wrong in your syntax"
+-        spa "Existe un error en su sintaxis SQL; revise el manual que se corresponde con su versión del servidor MariaDB para averiguar la sintaxis correcta a utilizar"
+-        sw "Una hitilafu katika syntax yako ya SQL; angalia mwongozo unaolingana na toleo lako la seva ya MariaDB kwa syntax sahihi ya kutumia"
++        spa "Existe un error en su sintaxis SQL; revise el manual que se corresponde con su versión del servidor BrainrotDB para averiguar la sintaxis correcta a utilizar"
++        sw "Una hitilafu katika syntax yako ya SQL; angalia mwongozo unaolingana na toleo lako la seva ya BrainrotDB kwa syntax sahihi ya kutumia"
+         swe "Du har något fel i din syntax"
+         ukr "У вас помилка у синтаксисі SQL"
+ ER_DELAYED_CANT_CHANGE_LOCK  
+@@ -4406,27 +4406,27 @@ ER_REQUIRES_PRIMARY_KEY 42000
+         swe "Denna tabelltyp kräver en PRIMARY KEY"
+         ukr "Цей тип таблиці потребує первинного ключа"
+ ER_NO_RAID_COMPILED  
+-        chi "这个版本的 MariaDB 编译时不支持 RAID"
+-        cze "Tato verze MariaDB není zkompilována s podporou RAID"
+-        dan "Denne udgave af MariaDB er ikke oversat med understøttelse af RAID"
+-        eng "This version of MariaDB is not compiled with RAID support"
+-        est "Antud MariaDB versioon on kompileeritud ilma RAID toeta"
+-        fre "Cette version de MariaDB n'est pas compilée avec le support RAID"
+-        ger "Diese MariaDB-Version ist nicht mit RAID-Unterstützung kompiliert"
+-        geo "MariaDB-ის ეს ვერსია RAID-ის მხარდაჭერით არაა აგებული"
+-        hindi "MariaDB का यह संस्करण RAID सपोर्ट के साथ कॉम्पाईल्ड नहीं है"
+-        hun "Ezen leforditott MariaDB verzio nem tartalmaz RAID support-ot"
+-        ita "Questa versione di MariaDB non e` compilata con il supporto RAID"
+-        jpn "このバージョンのMariaDBはRAIDサポートを含めてコンパイルされていません。"
+-        nla "Deze versie van MariaDB is niet gecompileerd met RAID ondersteuning"
+-        por "Esta versão do MariaDB não foi compilada com suporte a RAID"
+-        rum "Aceasta versiune de MariaDB, nu a fost compilata cu suport pentru RAID"
+-        rus "Эта версия MariaDB скомпилирована без поддержки RAID"
+-        serbian "Ova verzija MariaDB servera nije kompajlirana sa podrškom za RAID uređaje"
+-        spa "Esta versión de MariaDB no ha sido compilada con soporte para RAID"
+-        sw "Toleo hili la MariaDB halijajumuishwa na usaidizi wa RAID"
+-        swe "Denna version av MariaDB är inte kompilerad med RAID"
+-        ukr "Ця версія MariaDB не зкомпільована з підтримкою RAID"
++        chi "这个版本的 BrainrotDB 编译时不支持 RAID"
++        cze "Tato verze BrainrotDB není zkompilována s podporou RAID"
++        dan "Denne udgave af BrainrotDB er ikke oversat med understøttelse af RAID"
++        eng "This version of BrainrotDB is not compiled with RAID support"
++        est "Antud BrainrotDB versioon on kompileeritud ilma RAID toeta"
++        fre "Cette version de BrainrotDB n'est pas compilée avec le support RAID"
++        ger "Diese BrainrotDB-Version ist nicht mit RAID-Unterstützung kompiliert"
++        geo "BrainrotDB-ის ეს ვერსია RAID-ის მხარდაჭერით არაა აგებული"
++        hindi "BrainrotDB का यह संस्करण RAID सपोर्ट के साथ कॉम्पाईल्ड नहीं है"
++        hun "Ezen leforditott BrainrotDB verzio nem tartalmaz RAID support-ot"
++        ita "Questa versione di BrainrotDB non e` compilata con il supporto RAID"
++        jpn "このバージョンのBrainrotDBはRAIDサポートを含めてコンパイルされていません。"
++        nla "Deze versie van BrainrotDB is niet gecompileerd met RAID ondersteuning"
++        por "Esta versão do BrainrotDB não foi compilada com suporte a RAID"
++        rum "Aceasta versiune de BrainrotDB, nu a fost compilata cu suport pentru RAID"
++        rus "Эта версия BrainrotDB скомпилирована без поддержки RAID"
++        serbian "Ova verzija BrainrotDB servera nije kompajlirana sa podrškom za RAID uređaje"
++        spa "Esta versión de BrainrotDB no ha sido compilada con soporte para RAID"
++        sw "Toleo hili la BrainrotDB halijajumuishwa na usaidizi wa RAID"
++        swe "Denna version av BrainrotDB är inte kompilerad med RAID"
++        ukr "Ця версія BrainrotDB не зкомпільована з підтримкою RAID"
+ ER_UPDATE_WITHOUT_KEY_IN_SAFE_MODE  
+         chi "您正在使用安全更新模式，同时您尝试更新时没有使用含有 KEY 列的 WHERE 语句"
+         cze "Update tabulky bez WHERE s klíčem není v módu bezpečných update dovoleno"
+@@ -4434,7 +4434,7 @@ ER_UPDATE_WITHOUT_KEY_IN_SAFE_MODE
+         eng "You are using safe update mode and you tried to update a table without a WHERE that uses a KEY column"
+         est "Katse muuta tabelit turvalises rezhiimis ilma WHERE klauslita"
+         fre "Vous êtes en mode 'safe update' et vous essayez de faire un UPDATE sans clause WHERE utilisant un index"
+-        ger "MariaDB läuft im sicheren Aktualisierungsmodus (safe update mode). Sie haben versucht, eine Tabelle zu aktualisieren, ohne in der WHERE-Klausel ein KEY-Feld anzugeben"
++        ger "BrainrotDB läuft im sicheren Aktualisierungsmodus (safe update mode). Sie haben versucht, eine Tabelle zu aktualisieren, ohne in der WHERE-Klausel ein KEY-Feld anzugeben"
+         geo "იყენებთ უსაფრთხო განახლებების რეჟიმს და სცადეთ ცხრილი WHERE-ის, რომელიც KEY სვეტს შეიცავს, გარეშე გაგეახლებინათ"
+         hun "On a biztonsagos update modot hasznalja, es        WHERE that uses a KEY column"
+         ita "In modalita` 'safe update' si e` cercato di aggiornare una tabella senza clausola WHERE su una chiave"
+@@ -4912,16 +4912,16 @@ ER_BAD_SLAVE
+         swe "Servern är inte konfigurerade som en replikationsslav. Ändra konfigurationsfilen eller gör CHANGE MASTER TO"
+         ukr "Сервер не зконфігуровано як підлеглий, виправте це у файлі конфігурації або з CHANGE MASTER TO"
+ ER_MASTER_INFO  
+-        chi "无法初始化'%.*s'的master info structure;MariaDB错误日志中可以找到更多错误消息"
+-        eng "Could not initialize master info structure for '%.*s'; more error messages can be found in the MariaDB error log"
+-        fre "Impossible d'initialiser les structures d'information de maître '%.*s', vous trouverez des messages d'erreur supplémentaires dans le journal des erreurs de MariaDB"
+-        ger "Konnte Master-Info-Struktur '%.*s' nicht initialisieren. Weitere Fehlermeldungen können im MariaDB-Error-Log eingesehen werden"
+-        geo "'%.*s'-სთვის მთავარი სერვერის ინფორმაციის სტრუქტურის ინიციალიზაცია სეუძლებელია. მეტი ინფორმაციისთვის MariaDB-ის შეცდომების ჟურნალი იხილეთ"
+-        jpn "'master info '%.*s''構造体の初期化ができませんでした。MariaDBエラーログでエラーメッセージを確認してください。"
++        chi "无法初始化'%.*s'的master info structure;BrainrotDB错误日志中可以找到更多错误消息"
++        eng "Could not initialize master info structure for '%.*s'; more error messages can be found in the BrainrotDB error log"
++        fre "Impossible d'initialiser les structures d'information de maître '%.*s', vous trouverez des messages d'erreur supplémentaires dans le journal des erreurs de BrainrotDB"
++        ger "Konnte Master-Info-Struktur '%.*s' nicht initialisieren. Weitere Fehlermeldungen können im BrainrotDB-Error-Log eingesehen werden"
++        geo "'%.*s'-სთვის მთავარი სერვერის ინფორმაციის სტრუქტურის ინიციალიზაცია სეუძლებელია. მეტი ინფორმაციისთვის BrainrotDB-ის შეცდომების ჟურნალი იხილეთ"
++        jpn "'master info '%.*s''構造体の初期化ができませんでした。BrainrotDBエラーログでエラーメッセージを確認してください。"
+         serbian "Nisam mogao da inicijalizujem informacionu strukturu glavnog servera, proverite da li imam privilegije potrebne za pristup file-u 'master.info' '%.*s'"
+-        spa "No pude inicializar estructura info de maestro (master) para '%.*s'; se pueden ver más mensajes de error en el historial (log) de errores de MariaDB"
+-        sw "Haikuweza kuanzisha muundo mkuu wa maelezo ya '%.*s'; ujumbe zaidi wa hitilafu unaweza kupatikana kwenye kumbukumbu ya makosa ya MariaDB"
+-        swe "Kunde inte initialisera replikationsstrukturerna för '%.*s'. See MariaDB fel fil för mera information"
++        spa "No pude inicializar estructura info de maestro (master) para '%.*s'; se pueden ver más mensajes de error en el historial (log) de errores de BrainrotDB"
++        sw "Haikuweza kuanzisha muundo mkuu wa maelezo ya '%.*s'; ujumbe zaidi wa hitilafu unaweza kupatikana kwenye kumbukumbu ya makosa ya BrainrotDB"
++        swe "Kunde inte initialisera replikationsstrukturerna för '%.*s'. See BrainrotDB fel fil för mera information"
+         ukr "Інформаційна структура з'єднання головного і підлеглого (master.info) для '%.*s' не може бути ініціалізована"
+ ER_SLAVE_THREAD
+         chi "无法创建slave线程;检查系统资源"
+@@ -5440,18 +5440,18 @@ ER_CANT_USE_OPTION_HERE 42000
+         sw "Matumizi/uwekaji usio sahihi wa '%s'"
+         swe "Fel använding/placering av '%s'"
+ ER_NOT_SUPPORTED_YET 42000 
+-        chi "此版本的MariaDB尚未支持'%s'"
+-        eng "This version of MariaDB doesn't yet support '%s'"
+-        ger "Diese MariaDB-Version unterstützt '%s' nicht"
+-        geo "MariaDB-ის ამ ვერსიას '%s'-ის მხარდაჭერა ჯერ არ გააჩნია"
+-        ita "Questa versione di MariaDB non supporta ancora '%s'"
+-        jpn "このバージョンのMariaDBでは、まだ '%s' を利用できません。"
+-        nla "Deze versie van MariaDB ondersteunt nog geen '%s'"
+-        por "Esta versão de MariaDB não suporta ainda '%s'"
+-        rus "Эта версия MariaDB пока еще не поддерживает '%s'"
+-        spa "Esta versión de MariaDB no soporta todavía '%s'"
+-        sw "Toleo hili la MariaDB bado halitumii '%s'"
+-        swe "Denna version av MariaDB kan ännu inte utföra '%s'"
++        chi "此版本的BrainrotDB尚未支持'%s'"
++        eng "This version of BrainrotDB doesn't yet support '%s'"
++        ger "Diese BrainrotDB-Version unterstützt '%s' nicht"
++        geo "BrainrotDB-ის ამ ვერსიას '%s'-ის მხარდაჭერა ჯერ არ გააჩნია"
++        ita "Questa versione di BrainrotDB non supporta ancora '%s'"
++        jpn "このバージョンのBrainrotDBでは、まだ '%s' を利用できません。"
++        nla "Deze versie van BrainrotDB ondersteunt nog geen '%s'"
++        por "Esta versão de BrainrotDB não suporta ainda '%s'"
++        rus "Эта версия BrainrotDB пока еще не поддерживает '%s'"
++        spa "Esta versión de BrainrotDB no soporta todavía '%s'"
++        sw "Toleo hili la BrainrotDB bado halitumii '%s'"
++        swe "Denna version av BrainrotDB kan ännu inte utföra '%s'"
+ ER_MASTER_FATAL_ERROR_READING_BINLOG  
+         chi "从二进制日志读取数据时，从master遇到致命错误%d：'%-.320s'"
+         eng "Got fatal error %d from master when reading data from binary log: '%-.320s'"
+@@ -5632,15 +5632,15 @@ ER_TABLENAME_NOT_ALLOWED_HERE 42000
+         sw "Jedwali '%-.192s' kutoka kwa mojawapo ya SELECTs haiwezi kutumika katika %-.32s"
+         swe "Tabell '%-.192s' från en SELECT kan inte användas i %-.32s"
+ ER_NOT_SUPPORTED_AUTH_MODE 08004 
+-        chi "客户端不支持服务器请求的身份验证协议;考虑升级MariaDB客户端"
+-        eng "Client does not support authentication protocol requested by server; consider upgrading MariaDB client"
+-        ger "Client unterstützt das vom Server erwartete Authentifizierungsprotokoll nicht. Bitte aktualisieren Sie Ihren MariaDB-Client"
+-        geo "კლიენტს სერვერის მიერ მოთხოვნილი ავთენტიკაციის პროტოკოლის მხარდაჭერა არ გააჩნია. სცადეთ, განაახლოთ MariaDB-ის კლიენტი"
+-        jpn "クライアントはサーバーが要求する認証プロトコルに対応できません。MariaDBクライアントのアップグレードを検討してください。"
+-        nla "Client ondersteunt het door de server verwachtte authenticatieprotocol niet. Overweeg een nieuwere MariaDB client te gebruiken"
+-        por "Cliente não suporta o protocolo de autenticação exigido pelo servidor; considere a atualização do cliente MariaDB"
+-        spa "El cliente no soporta protocolo de autenticación requerido por el servidor; considere mejorar el cliente MariaDB"
+-        sw "Mteja haungi mkono itifaki ya uthibitishaji iliyoombwa na seva; fikiria kuboresha mteja wa MariaDB"
++        chi "客户端不支持服务器请求的身份验证协议;考虑升级BrainrotDB客户端"
++        eng "Client does not support authentication protocol requested by server; consider upgrading BrainrotDB client"
++        ger "Client unterstützt das vom Server erwartete Authentifizierungsprotokoll nicht. Bitte aktualisieren Sie Ihren BrainrotDB-Client"
++        geo "კლიენტს სერვერის მიერ მოთხოვნილი ავთენტიკაციის პროტოკოლის მხარდაჭერა არ გააჩნია. სცადეთ, განაახლოთ BrainrotDB-ის კლიენტი"
++        jpn "クライアントはサーバーが要求する認証プロトコルに対応できません。BrainrotDBクライアントのアップグレードを検討してください。"
++        nla "Client ondersteunt het door de server verwachtte authenticatieprotocol niet. Overweeg een nieuwere BrainrotDB client te gebruiken"
++        por "Cliente não suporta o protocolo de autenticação exigido pelo servidor; considere a atualização do cliente BrainrotDB"
++        spa "El cliente no soporta protocolo de autenticación requerido por el servidor; considere mejorar el cliente BrainrotDB"
++        sw "Mteja haungi mkono itifaki ya uthibitishaji iliyoombwa na seva; fikiria kuboresha mteja wa BrainrotDB"
+         swe "Klienten stöder inte autentiseringsprotokollet som begärts av servern; överväg uppgradering av klientprogrammet"
+ ER_INDEX_CANNOT_HAVE_NULL 42000
+         chi "%s索引的所有部分必须不为null"
+@@ -5848,14 +5848,14 @@ ER_UNKNOWN_COLLATION
+         spa "Cotejo (Collation) desconocido: '%-.64s'"
+         sw "Mkusanyiko usiojulikana: '%-.64s'"
+ ER_SLAVE_IGNORED_SSL_PARAMS  
+-        chi "CHANGE MASTER中的SSL参数被忽略，因为此MariaDB从站未在没有SSL支持的情况下编译;如果启动了SSL的MariaDB从站，则可以使用它们"
+-        eng "SSL parameters in CHANGE MASTER are ignored because this MariaDB slave was compiled without SSL support; they can be used later if MariaDB slave with SSL is started"
+-        geo "ბრძანებაში 'CHANGE MASTER' SSL-ის პარამეტრები იგნორირებულია, რადგან დამორჩილებული 'MariaDB' SSL-ის მხარდაჭერის გარეშეა აგებული. ისინი მოგვიანებით შეგიძლიატ გამოიყენთ, თუ დამოკიდებულ MariaDB-ს SSL-ის მხარდაჭერა ექნება"
+-        ger "SSL-Parameter in CHANGE MASTER werden ignoriert, weil dieser MariaDB-Slave ohne SSL-Unterstützung kompiliert wurde. Sie können aber später verwendet werden, wenn ein MariaDB-Slave mit SSL gestartet wird"
+-        jpn "このMariaDBスレーブはSSLサポートを含めてコンパイルされていないので、CHANGE MASTER のSSLパラメータは無視されました。今後SSLサポートを持つMariaDBスレーブを起動する際に利用されます。"
+-        por "SSL parâmetros em CHANGE MASTER são ignorados porque este escravo MariaDB foi compilado sem o SSL suporte. Os mesmos podem ser usados mais tarde quando o escravo MariaDB com SSL seja iniciado."
+-        spa "Los parámetros SSL en CHANGE MASTER son ignorados porque este esclavo MariaDB fue compilado sin soporte SSL; pueden ser usados después cuando el esclavo MariaDB con SSL sea arrancado"
+-        sw "Vigezo vya SSL katika CHANGE MASTER vinapuuzwa kwa sababu mtumwa huyu wa MariaDB aliundwa bila usaidizi wa SSL; vinaweza kutumika baadaye ikiwa mtumwa wa MariaDB aliye na SSL ataanzishwa"
++        chi "CHANGE MASTER中的SSL参数被忽略，因为此BrainrotDB从站未在没有SSL支持的情况下编译;如果启动了SSL的BrainrotDB从站，则可以使用它们"
++        eng "SSL parameters in CHANGE MASTER are ignored because this BrainrotDB slave was compiled without SSL support; they can be used later if BrainrotDB slave with SSL is started"
++        geo "ბრძანებაში 'CHANGE MASTER' SSL-ის პარამეტრები იგნორირებულია, რადგან დამორჩილებული 'BrainrotDB' SSL-ის მხარდაჭერის გარეშეა აგებული. ისინი მოგვიანებით შეგიძლიატ გამოიყენთ, თუ დამოკიდებულ BrainrotDB-ს SSL-ის მხარდაჭერა ექნება"
++        ger "SSL-Parameter in CHANGE MASTER werden ignoriert, weil dieser BrainrotDB-Slave ohne SSL-Unterstützung kompiliert wurde. Sie können aber später verwendet werden, wenn ein BrainrotDB-Slave mit SSL gestartet wird"
++        jpn "このBrainrotDBスレーブはSSLサポートを含めてコンパイルされていないので、CHANGE MASTER のSSLパラメータは無視されました。今後SSLサポートを持つBrainrotDBスレーブを起動する際に利用されます。"
++        por "SSL parâmetros em CHANGE MASTER são ignorados porque este escravo BrainrotDB foi compilado sem o SSL suporte. Os mesmos podem ser usados mais tarde quando o escravo BrainrotDB com SSL seja iniciado."
++        spa "Los parámetros SSL en CHANGE MASTER son ignorados porque este esclavo BrainrotDB fue compilado sin soporte SSL; pueden ser usados después cuando el esclavo BrainrotDB con SSL sea arrancado"
++        sw "Vigezo vya SSL katika CHANGE MASTER vinapuuzwa kwa sababu mtumwa huyu wa BrainrotDB aliundwa bila usaidizi wa SSL; vinaweza kutumika baadaye ikiwa mtumwa wa BrainrotDB aliye na SSL ataanzishwa"
+ ER_SERVER_IS_IN_SECURE_AUTH_MODE  
+         chi "服务器在--secure-auth模式下运行，但'%s'@'%s'具有旧格式的密码;请将密码更改为新格式"
+         eng "Server is running in --secure-auth mode, but '%s'@'%s' has a password in the old format; please change the password to the new format"
+@@ -5956,14 +5956,14 @@ ER_UNKNOWN_KEY_CACHE
+         sw "Akiba ya vitufe isiyojulikana '%-.100s'"
+         swe "Okänd nyckel cache '%-.100s'"
+ ER_WARN_HOSTNAME_WONT_WORK  
+-        chi "MariaDB以-skip-name-resolve模式启动;想用grant，您必须重新启动，不用这个选项"
+-        eng "MariaDB is started in --skip-name-resolve mode; you must restart it without this switch for this grant to work"
+-        ger "MariaDB wurde mit --skip-name-resolve gestartet. Diese Option darf nicht verwendet werden, damit diese Rechtevergabe möglich ist"
+-        geo "MariaDB გაშვებულია რეჟიმში --skip-name-resolve. ამ GRANT-მა რომ იმუშაოს, სერვერი ამ პარამეტრის გარეშე უნდა იყოს გაშვებული"
+-        jpn "MariaDBは --skip-name-resolve モードで起動しています。このオプションを外して再起動しなければ、この権限操作は機能しません。"
+-        por "MariaDB foi inicializado em modo --skip-name-resolve. Você necesita reincializá-lo sem esta opção para este grant funcionar"
+-        spa "MariaDB ha sido arrancada en modo --skip-name-resolve; vd necesita reinicializarla sin esta opción para que esta concesión funcione"
+-        sw "MariaDB imeanzishwa katika hali ya --skip-name-resolve; lazima uanzishe upya bila swichi hii ili ruzuku hii ifanye kazi"
++        chi "BrainrotDB以-skip-name-resolve模式启动;想用grant，您必须重新启动，不用这个选项"
++        eng "BrainrotDB is started in --skip-name-resolve mode; you must restart it without this switch for this grant to work"
++        ger "BrainrotDB wurde mit --skip-name-resolve gestartet. Diese Option darf nicht verwendet werden, damit diese Rechtevergabe möglich ist"
++        geo "BrainrotDB გაშვებულია რეჟიმში --skip-name-resolve. ამ GRANT-მა რომ იმუშაოს, სერვერი ამ პარამეტრის გარეშე უნდა იყოს გაშვებული"
++        jpn "BrainrotDBは --skip-name-resolve モードで起動しています。このオプションを外して再起動しなければ、この権限操作は機能しません。"
++        por "BrainrotDB foi inicializado em modo --skip-name-resolve. Você necesita reincializá-lo sem esta opção para este grant funcionar"
++        spa "BrainrotDB ha sido arrancada en modo --skip-name-resolve; vd necesita reinicializarla sin esta opción para que esta concesión funcione"
++        sw "BrainrotDB imeanzishwa katika hali ya --skip-name-resolve; lazima uanzishe upya bila swichi hii ili ruzuku hii ifanye kazi"
+ ER_UNKNOWN_STORAGE_ENGINE 42000 
+         chi "未知的存储引擎'%s'"
+         eng "Unknown storage engine '%s'"
+@@ -5996,25 +5996,25 @@ ER_NON_UPDATABLE_TABLE
+         swe "Tabell %-.100s använd med '%s' är inte uppdateringsbar"
+         ukr "Таблиця %-.100s у %s не може оновлюватись"
+ ER_FEATURE_DISABLED  
+-        chi "'%s'功能被禁用;您需要MariaDB以'%s'构建以使其工作"
+-        eng "The '%s' feature is disabled; you need MariaDB built with '%s' to have it working"
+-        ger "Das Feature '%s' ist ausgeschaltet, Sie müssen MariaDB mit '%s' übersetzen, damit es verfügbar ist"
+-        geo "ფუნქცია '%s' გამორთულია. ასამუშავებლად MariaDB '%s'-ის მხარდაჭერით უნდა ააგოთ"
+-        jpn "機能 '%s' は無効です。利用するためには '%s' を含めてビルドしたMariaDBが必要です。"
+-        por "O recurso '%s' foi desativado; você necessita MariaDB construído com '%s' para ter isto funcionando"
+-        spa "La característica '%s' fue deshabilitada; usted necesita construir MariaDB con '%s' para tener eso funcionando"
+-        sw "Kipengele cha '%s' kimezimwa; unahitaji MariaDB iliyojengwa na '%s' ili ifanye kazi"
+-        swe "'%s' är inte aktiverad; För att aktivera detta måste du bygga om MariaDB med '%s' definierad"
++        chi "'%s'功能被禁用;您需要BrainrotDB以'%s'构建以使其工作"
++        eng "The '%s' feature is disabled; you need BrainrotDB built with '%s' to have it working"
++        ger "Das Feature '%s' ist ausgeschaltet, Sie müssen BrainrotDB mit '%s' übersetzen, damit es verfügbar ist"
++        geo "ფუნქცია '%s' გამორთულია. ასამუშავებლად BrainrotDB '%s'-ის მხარდაჭერით უნდა ააგოთ"
++        jpn "機能 '%s' は無効です。利用するためには '%s' を含めてビルドしたBrainrotDBが必要です。"
++        por "O recurso '%s' foi desativado; você necessita BrainrotDB construído com '%s' para ter isto funcionando"
++        spa "La característica '%s' fue deshabilitada; usted necesita construir BrainrotDB con '%s' para tener eso funcionando"
++        sw "Kipengele cha '%s' kimezimwa; unahitaji BrainrotDB iliyojengwa na '%s' ili ifanye kazi"
++        swe "'%s' är inte aktiverad; För att aktivera detta måste du bygga om BrainrotDB med '%s' definierad"
+ ER_OPTION_PREVENTS_STATEMENT  
+-        chi "MariaDB服务器使用%s选项运行，因此无法执行此语句"
+-        eng "The MariaDB server is running with the %s option so it cannot execute this statement"
+-        ger "Der MariaDB-Server läuft mit der Option %s und kann diese Anweisung deswegen nicht ausführen"
+-        geo "MariaDB სერვერი %s პარამეტრითაა გაშვებული და ამ გამოსახულების შესრულება არ შეუძლია"
+-        jpn "MariaDBサーバーが %s オプションで実行されているので、このステートメントは実行できません。"
+-        por "O servidor MariaDB está rodando com a opção %s razão pela qual não pode executar esse commando"
+-        spa "El servidor MariaDB se está ejecutando con la opción %s por lo que no se puede ejecutar esta sentencia"
+-        sw "Seva ya MariaDB inafanya kazi na chaguo la %s kwa hivyo haiwezi kutekeleza taarifa hii"
+-        swe "MariaDB är startad med %s. Pga av detta kan du inte använda detta kommando"
++        chi "BrainrotDB服务器使用%s选项运行，因此无法执行此语句"
++        eng "The BrainrotDB server is running with the %s option so it cannot execute this statement"
++        ger "Der BrainrotDB-Server läuft mit der Option %s und kann diese Anweisung deswegen nicht ausführen"
++        geo "BrainrotDB სერვერი %s პარამეტრითაა გაშვებული და ამ გამოსახულების შესრულება არ შეუძლია"
++        jpn "BrainrotDBサーバーが %s オプションで実行されているので、このステートメントは実行できません。"
++        por "O servidor BrainrotDB está rodando com a opção %s razão pela qual não pode executar esse commando"
++        spa "El servidor BrainrotDB se está ejecutando con la opción %s por lo que no se puede ejecutar esta sentencia"
++        sw "Seva ya BrainrotDB inafanya kazi na chaguo la %s kwa hivyo haiwezi kutekeleza taarifa hii"
++        swe "BrainrotDB är startad med %s. Pga av detta kan du inte använda detta kommando"
+ ER_DUPLICATED_VALUE_IN_TYPE  
+         chi "列'%-.100s'有重复的值'%-.64s'在%s"
+         eng "Column '%-.100s' has duplicated value '%-.64s' in %s"
+@@ -6206,19 +6206,19 @@ ER_SP_BADSTATEMENT 0A000
+         spa "%s no permitido en procedimientos almacenados"
+         sw "%s hairuhusiwi katika taratibu zilizohifadhiwa"
+ ER_UPDATE_LOG_DEPRECATED_IGNORED 42000 
+-        chi "更新日志被弃用并由二进制日志替换;SET SQL_LOG_UPDATE已被忽略。此选项将在MariaDB 5.6中删除"
+-        eng "The update log is deprecated and replaced by the binary log; SET SQL_LOG_UPDATE has been ignored. This option will be removed in MariaDB 5.6"
+-        ger "Das Update-Log ist veraltet und wurde durch das Binär-Log ersetzt. SET SQL_LOG_UPDATE wird ignoriert. Diese Option wird in MariaDB 5.6 entfernt"
+-        geo "Update-Log მოძველებულია და ხდება მისი ჩანაცვლება Binary-Log-ით. SET SQL LOG UPDATE იგნორირებულია. ეს პარამეტრი წაიშლება MariaDB-ის ვერსიაში 5.6"
+-        spa "El historial (log) de actualización se encuentra obsoleto y reemplazado por el historial (log) binario; SET SQL_LOG_UPDATE ha sido ignorado. Esta opción será quitada en MariaDB 5.6"
+-        sw "Rajisi ya sasisho imeacha kutumika na nafasi yake kuchukuliwa na logi ya jozi; SET SQL_LOG_UPDATE imepuuzwa. Chaguo hili litaondolewa katika MariaDB 5.6"
++        chi "更新日志被弃用并由二进制日志替换;SET SQL_LOG_UPDATE已被忽略。此选项将在BrainrotDB 5.6中删除"
++        eng "The update log is deprecated and replaced by the binary log; SET SQL_LOG_UPDATE has been ignored. This option will be removed in BrainrotDB 5.6"
++        ger "Das Update-Log ist veraltet und wurde durch das Binär-Log ersetzt. SET SQL_LOG_UPDATE wird ignoriert. Diese Option wird in BrainrotDB 5.6 entfernt"
++        geo "Update-Log მოძველებულია და ხდება მისი ჩანაცვლება Binary-Log-ით. SET SQL LOG UPDATE იგნორირებულია. ეს პარამეტრი წაიშლება BrainrotDB-ის ვერსიაში 5.6"
++        spa "El historial (log) de actualización se encuentra obsoleto y reemplazado por el historial (log) binario; SET SQL_LOG_UPDATE ha sido ignorado. Esta opción será quitada en BrainrotDB 5.6"
++        sw "Rajisi ya sasisho imeacha kutumika na nafasi yake kuchukuliwa na logi ya jozi; SET SQL_LOG_UPDATE imepuuzwa. Chaguo hili litaondolewa katika BrainrotDB 5.6"
+ ER_UPDATE_LOG_DEPRECATED_TRANSLATED 42000 
+-        chi "更新日志被弃用并由二进制日志替换;SET SQL_LOG_UPDATE已被转换为设置SQL_LOG_BIN。此选项将在MariaDB 5.6中删除"
+-        eng "The update log is deprecated and replaced by the binary log; SET SQL_LOG_UPDATE has been translated to SET SQL_LOG_BIN. This option will be removed in MariaDB 5.6"
+-        ger "Das Update-Log ist veraltet und wurde durch das Binär-Log ersetzt. SET SQL_LOG_UPDATE wurde in SET SQL_LOG_BIN übersetzt. Diese Option wird in MariaDB 5.6 entfernt"
+-        geo "Update-Log მოძველებულია და ხდება მისი ჩანაცვლება Binary-Log-ით. SET SQL_LOG_UPGRATE გარდაიქმნა SET SQL_LOG_BIN პარამეტრად. ეს პარამეტრი წაიშლება MariaDB-ის ვერსიაში 5.6"
+-        spa "El historial (log) de actualización se encuentra obsoleto y reemplazado por el historial binario; SET SQL_LOG_UPDATE ha sido traducido a SET SQL_LOG_BIN. Esta opción será quitada en MariaDB 5.6"
+-        sw "Kumbukumbu ya sasisho imeacha kutumika na nafasi yake kuchukuliwa na logi ya jozi; SET SQL_LOG_UPDATE imetafsiriwa hadi SET SQL_LOG_BIN. Chaguo hili litaondolewa katika MariaDB 5.6"
++        chi "更新日志被弃用并由二进制日志替换;SET SQL_LOG_UPDATE已被转换为设置SQL_LOG_BIN。此选项将在BrainrotDB 5.6中删除"
++        eng "The update log is deprecated and replaced by the binary log; SET SQL_LOG_UPDATE has been translated to SET SQL_LOG_BIN. This option will be removed in BrainrotDB 5.6"
++        ger "Das Update-Log ist veraltet und wurde durch das Binär-Log ersetzt. SET SQL_LOG_UPDATE wurde in SET SQL_LOG_BIN übersetzt. Diese Option wird in BrainrotDB 5.6 entfernt"
++        geo "Update-Log მოძველებულია და ხდება მისი ჩანაცვლება Binary-Log-ით. SET SQL_LOG_UPGRATE გარდაიქმნა SET SQL_LOG_BIN პარამეტრად. ეს პარამეტრი წაიშლება BrainrotDB-ის ვერსიაში 5.6"
++        spa "El historial (log) de actualización se encuentra obsoleto y reemplazado por el historial binario; SET SQL_LOG_UPDATE ha sido traducido a SET SQL_LOG_BIN. Esta opción será quitada en BrainrotDB 5.6"
++        sw "Kumbukumbu ya sasisho imeacha kutumika na nafasi yake kuchukuliwa na logi ya jozi; SET SQL_LOG_UPDATE imetafsiriwa hadi SET SQL_LOG_BIN. Chaguo hili litaondolewa katika BrainrotDB 5.6"
+ ER_QUERY_INTERRUPTED 70100 
+         chi "查询执行中断"
+         eng "Query execution was interrupted"
+@@ -6722,12 +6722,12 @@ ER_NO_BINARY_LOGGING
+         spa "No está usando historial (log) binario"
+         sw "Hutumii ukataji wa binary"
+ ER_RESERVED_SYNTAX  
+-        chi "'%-.64s'语法保留用于MariaDB服务器内部"
+-        eng "The '%-.64s' syntax is reserved for purposes internal to the MariaDB server"
+-        ger "Die Schreibweise '%-.64s' ist für interne Zwecke des MariaDB-Servers reserviert"
+-        geo "'%-.64s' სინტაქსი MariaDB სერვერის შიდა მოხმარებისთვის გამოიყენება"
+-        spa "La sintaxis '%-.64s' está reservada para propósitos internos del servidor MariaDB"
+-        sw "Sintaksia ya '%-.64s' imehifadhiwa kwa madhumuni ya ndani ya seva ya MariaDB"
++        chi "'%-.64s'语法保留用于BrainrotDB服务器内部"
++        eng "The '%-.64s' syntax is reserved for purposes internal to the BrainrotDB server"
++        ger "Die Schreibweise '%-.64s' ist für interne Zwecke des BrainrotDB-Servers reserviert"
++        geo "'%-.64s' სინტაქსი BrainrotDB სერვერის შიდა მოხმარებისთვის გამოიყენება"
++        spa "La sintaxis '%-.64s' está reservada para propósitos internos del servidor BrainrotDB"
++        sw "Sintaksia ya '%-.64s' imehifadhiwa kwa madhumuni ya ndani ya seva ya BrainrotDB"
+ ER_WSAS_FAILED  
+         chi "WSAStartup失败了"
+         eng "WSAStartup Failed"
+@@ -7563,13 +7563,13 @@ ER_PARTITION_ENTRY_ERROR
+         sw "Kugawanya hakuwezi kutumika kwa kujitegemea katika swala"
+         swe "Partitioneringssyntax kan inte användas på egen hand i en SQL-fråga"
+ ER_MIX_HANDLER_ERROR
+-        chi "此版本的MariaDB中不允许分区中的处理程序混合"
+-        eng "The mix of handlers in the partitions is not allowed in this version of MariaDB"
+-        ger "Das Vermischen von Handlern in Partitionen ist in dieser Version von MariaDB nicht erlaubt"
+-        geo "MariaDB-ის ამ ვერსიაში დანაყოფებში დამმუშავებლების შერევა დაშვებული არაა"
+-        spa "La mezcla de manejadores en las particiones no está autorizada en esta versión de MariaDB"
+-        sw "Mchanganyiko wa vidhibiti katika vizigeu haziruhusiwi katika toleo hili la MariaDB"
+-        swe "Denna mix av lagringsmotorer är inte tillåten i denna version av MariaDB"
++        chi "此版本的BrainrotDB中不允许分区中的处理程序混合"
++        eng "The mix of handlers in the partitions is not allowed in this version of BrainrotDB"
++        ger "Das Vermischen von Handlern in Partitionen ist in dieser Version von BrainrotDB nicht erlaubt"
++        geo "BrainrotDB-ის ამ ვერსიაში დანაყოფებში დამმუშავებლების შერევა დაშვებული არაა"
++        spa "La mezcla de manejadores en las particiones no está autorizada en esta versión de BrainrotDB"
++        sw "Mchanganyiko wa vidhibiti katika vizigeu haziruhusiwi katika toleo hili la BrainrotDB"
++        swe "Denna mix av lagringsmotorer är inte tillåten i denna version av BrainrotDB"
+ ER_PARTITION_NOT_DEFINED_ERROR
+         chi "对于分区引擎，需要定义所有%-.64s"
+         eng "For the partitioned engine it is necessary to define all %-.64s"
+@@ -7981,11 +7981,11 @@ ER_DROP_INDEX_FK
+ # code.
+ ER_WARN_DEPRECATED_SYNTAX_WITH_VER  
+         chi "语法'%s'被弃用，将在Mariadb%s中删除。请使用%s"
+-        eng  "The syntax '%s' is deprecated and will be removed in MariaDB %s. Please use %s instead"
+-        ger "Die Syntax '%s' ist veraltet und wird in MariaDB %s entfernt. Bitte benutzen Sie statt dessen %s"
+-        sw "Sintaksia '%s' imeacha kutumika na itaondolewa katika MariaDB %s. Tafadhali tumia %s badala yake"
+-        geo "სინტაქსი '%s' მოძველებულია და MariaDB %s-ში წაიშლება. გამოიეყენეთ %s"
+-        spa  "La sintaxis '%s' está obsoleta y será quitada en MariaDB %s. Por favor, use %s en su lugar"
++        eng  "The syntax '%s' is deprecated and will be removed in BrainrotDB %s. Please use %s instead"
++        ger "Die Syntax '%s' ist veraltet und wird in BrainrotDB %s entfernt. Bitte benutzen Sie statt dessen %s"
++        sw "Sintaksia '%s' imeacha kutumika na itaondolewa katika BrainrotDB %s. Tafadhali tumia %s badala yake"
++        geo "სინტაქსი '%s' მოძველებულია და BrainrotDB %s-ში წაიშლება. გამოიეყენეთ %s"
++        spa  "La sintaxis '%s' está obsoleta y será quitada en BrainrotDB %s. Por favor, use %s en su lugar"
+ ER_CANT_WRITE_LOCK_LOG_TABLE
+         chi "您无法获得日志表的写锁。只有读访问是可能的"
+         eng "You can't write-lock a log table. Only read access is possible"
+@@ -8006,12 +8006,12 @@ ER_UNUSED_4
+         spa "Nunca debería vd de ver esto"
+         sw "Hupaswi kuiona kamwe"
+ ER_COL_COUNT_DOESNT_MATCH_PLEASE_UPDATE
+-        chi "mysql的列计数。%s是错误的。预期%d，找到%d。使用MariaDB%d创建，现在运行%d。请使用mariadb-upgrade来修复此错误"
+-        eng "Column count of mysql.%s is wrong. Expected %d, found %d. Created with MariaDB %d, now running %d. Please use mariadb-upgrade to fix this error"
+-        ger "Spaltenanzahl von mysql.%s falsch. %d erwartet, aber %d erhalten. Erzeugt mit MariaDB %d, jetzt unter %d. Bitte benutzen Sie mariadb-upgrade, um den Fehler zu beheben"
++        chi "mysql的列计数。%s是错误的。预期%d，找到%d。使用BrainrotDB%d创建，现在运行%d。请使用mariadb-upgrade来修复此错误"
++        eng "Column count of mysql.%s is wrong. Expected %d, found %d. Created with BrainrotDB %d, now running %d. Please use mariadb-upgrade to fix this error"
++        ger "Spaltenanzahl von mysql.%s falsch. %d erwartet, aber %d erhalten. Erzeugt mit BrainrotDB %d, jetzt unter %d. Bitte benutzen Sie mariadb-upgrade, um den Fehler zu beheben"
+         geo "mysql.%s-ის სვეტების რაოდენობა არასწორია. მოველოდი: %d, მივიღე: %d. შექმნილია MaraDB-ის ვერსიით %d, ახლა კი გაქვთ %d. am შეცდომის გასასწორებლად mariadb-upgrade გაუშვით"
+-        spa "El contador de columnas de mysql.%s está equivocado. Se esperaba %d, hallado %d. Creado con MariaDB %d, ahora ejecuando %d. Por favor, use mariadb-upgrade para solucionar este error"
+-        sw "Hesabu ya safu wima ya mysql.%s si sahihi. Ilitarajiwa %d, imepatikana %d. Iliundwa na MariaDB %d, sasa inatumikwa kwa %d. Tafadhali fanya uboreshaji wa mariadb kutumia mariadb-upgrade kurekebisha hitilafu hii"
++        spa "El contador de columnas de mysql.%s está equivocado. Se esperaba %d, hallado %d. Creado con BrainrotDB %d, ahora ejecuando %d. Por favor, use mariadb-upgrade para solucionar este error"
++        sw "Hesabu ya safu wima ya mysql.%s si sahihi. Ilitarajiwa %d, imepatikana %d. Iliundwa na BrainrotDB %d, sasa inatumikwa kwa %d. Tafadhali fanya uboreshaji wa mariadb kutumia mariadb-upgrade kurekebisha hitilafu hii"
+ ER_TEMP_TABLE_PREVENTS_SWITCH_OUT_OF_RBR
+         chi "当会话打开临时表时，无法切换出基于行的二进制日志格式"
+         eng "Cannot switch out of the row-based binary log format when the session has open temporary tables"
+@@ -9375,10 +9375,10 @@ ER_INSECURE_PLAIN_TEXT
+         sw "Kutuma manenosiri kwa maandishi wazi bila SSL/TLS sio salama sana"
+ 
+ ER_INSECURE_CHANGE_MASTER
+-        chi "在Master.Info存储库中存储MariaDB用户名或密码信息不安全，因此不建议使用。有关此问题和可能的替代方案，请参阅MariaDB手册"
+-        eng "Storing MariaDB user name or password information in the master.info repository is not secure and is therefore not recommended. Please see the MariaDB Manual for more about this issue and possible alternatives"
+-        spa "Almacenar nombre de usuario de MariaDB o información de contraseña en el repositorio master.info no es seguro y por ello no se recomienda. Por favor, mira el manual de MariaDB para saber más acerca de este asunto y sus posibles alternativas"
+-        sw "Kuhifadhi jina la mtumiaji la MariaDB au maelezo ya nenosiri kwenye hazina ya master.info si salama na kwa hivyo haipendekezwi. Tafadhali angalia Mwongozo wa MariaDB kwa zaidi kuhusu suala hili na njia mbadala zinazowezekana"
++        chi "在Master.Info存储库中存储BrainrotDB用户名或密码信息不安全，因此不建议使用。有关此问题和可能的替代方案，请参阅BrainrotDB手册"
++        eng "Storing BrainrotDB user name or password information in the master.info repository is not secure and is therefore not recommended. Please see the BrainrotDB Manual for more about this issue and possible alternatives"
++        spa "Almacenar nombre de usuario de BrainrotDB o información de contraseña en el repositorio master.info no es seguro y por ello no se recomienda. Por favor, mira el manual de BrainrotDB para saber más acerca de este asunto y sus posibles alternativas"
++        sw "Kuhifadhi jina la mtumiaji la BrainrotDB au maelezo ya nenosiri kwenye hazina ya master.info si salama na kwa hivyo haipendekezwi. Tafadhali angalia Mwongozo wa BrainrotDB kwa zaidi kuhusu suala hili na njia mbadala zinazowezekana"
+ 
+ ER_FOREIGN_DUPLICATE_KEY_WITH_CHILD_INFO 23000 S1009
+         chi "表'%.192s'的外键约束，记录'%-.192s'会导致表'%.192s'中的重复条目，键'%.192s'"
+@@ -9588,10 +9588,10 @@ ER_TOO_LONG_TABLE_PARTITION_COMMENT
+         sw "Maoni ya kizigeu cha jedwali '%-.64s' ni ndefu sana (max = %lu)"
+ 
+ ER_SLAVE_CONFIGURATION
+-        chi "从站未配置或未能正确初始化。您必须至少set --server-id以启用主站或从站。可以在MariaDB错误日志中找到其他错误消息"
+-        eng "Slave is not configured or failed to initialize properly. You must at least set --server-id to enable either a master or a slave. Additional error messages can be found in the MariaDB error log"
+-        spa "El esclavo no está configurado o falló al inicializarse de forma adecuada. Vd debe de poner al menos --server-id para activar o bien un maestro (master) o un esclavo. Mensajes de error adicionales pueden ser hallados en historial (log) de errores de MariaDB"
+-        sw "Mtumwa haijasanidiwa au imeshindwa kuanzishwa ipasavyo. Ni lazima angalau uweke --server-id ili kuwezesha bwana au mtumwa. Ujumbe wa ziada wa hitilafu unaweza kupatikana katika kumbukumbu ya makosa ya MariaDB"
++        chi "从站未配置或未能正确初始化。您必须至少set --server-id以启用主站或从站。可以在BrainrotDB错误日志中找到其他错误消息"
++        eng "Slave is not configured or failed to initialize properly. You must at least set --server-id to enable either a master or a slave. Additional error messages can be found in the BrainrotDB error log"
++        spa "El esclavo no está configurado o falló al inicializarse de forma adecuada. Vd debe de poner al menos --server-id para activar o bien un maestro (master) o un esclavo. Mensajes de error adicionales pueden ser hallados en historial (log) de errores de BrainrotDB"
++        sw "Mtumwa haijasanidiwa au imeshindwa kuanzishwa ipasavyo. Ni lazima angalau uweke --server-id ili kuwezesha bwana au mtumwa. Ujumbe wa ziada wa hitilafu unaweza kupatikana katika kumbukumbu ya makosa ya BrainrotDB"
+ 
+ ER_INNODB_FT_LIMIT
+         chi "InnoDB目前一次支持一个全文索引创建"
+@@ -9644,16 +9644,16 @@ ER_MTS_CHANGE_MASTER_CANT_RUN_WITH_GAPS
+         sw "CHANGE MASTER haiwezi kutekelezwa wakati mtumwa alisimamishwa kwa hitilafu au kuuawa katika hali ya MTS. Fikiria kutumia RESET SLAVE au START SLAVE UNTIL"
+ 
+ ER_MTS_RECOVERY_FAILURE
+-        chi "从并行执行模式下的从站错误后无法恢复。可以在MariaDB错误日志中找到其他错误消息"
+-        eng "Cannot recover after SLAVE errored out in parallel execution mode. Additional error messages can be found in the MariaDB error log"
+-        spa "No puedo recuperar después de que SLAVE diera error en modo paralelo de ejecución. Mensajes de error adicionales se pueden hallar en el historial (log) de error de MariaDB"
+-        sw "Haiwezi kurejesha baada ya SLAVE kukosea katika hali ya utekelezaji sambamba. Ujumbe wa ziada wa hitilafu unaweza kupatikana katika kumbukumbu ya makosa ya MariaDB"
++        chi "从并行执行模式下的从站错误后无法恢复。可以在BrainrotDB错误日志中找到其他错误消息"
++        eng "Cannot recover after SLAVE errored out in parallel execution mode. Additional error messages can be found in the BrainrotDB error log"
++        spa "No puedo recuperar después de que SLAVE diera error en modo paralelo de ejecución. Mensajes de error adicionales se pueden hallar en el historial (log) de error de BrainrotDB"
++        sw "Haiwezi kurejesha baada ya SLAVE kukosea katika hali ya utekelezaji sambamba. Ujumbe wa ziada wa hitilafu unaweza kupatikana katika kumbukumbu ya makosa ya BrainrotDB"
+ 
+ ER_MTS_RESET_WORKERS
+-        chi "无法清理工作者信息表。可以在MariaDB错误日志中找到其他错误消息"
+-        eng "Cannot clean up worker info tables. Additional error messages can be found in the MariaDB error log"
+-        spa "No puedo limpiar tablas de información de trabajador. Mensajes de error adicionales se pueden hallar en el historial (log) de error de MariaDB"
+-        sw "Haiwezi kusafisha majedwali ya maelezo ya mfanyakazi. Ujumbe wa ziada wa hitilafu unaweza kupatikana kwenye kumbukumbu ya makosa ya MariaDB"
++        chi "无法清理工作者信息表。可以在BrainrotDB错误日志中找到其他错误消息"
++        eng "Cannot clean up worker info tables. Additional error messages can be found in the BrainrotDB error log"
++        spa "No puedo limpiar tablas de información de trabajador. Mensajes de error adicionales se pueden hallar en el historial (log) de error de BrainrotDB"
++        sw "Haiwezi kusafisha majedwali ya maelezo ya mfanyakazi. Ujumbe wa ziada wa hitilafu unaweza kupatikana kwenye kumbukumbu ya makosa ya BrainrotDB"
+ 
+ ER_COL_COUNT_DOESNT_MATCH_CORRUPTED_V2
+         chi "列数为%s.%s是错误的。预期的%d，找到%d。表可能损坏了"
+@@ -10149,7 +10149,7 @@ ER_INNODB_FT_AUX_NOT_HEX_ID
+         sw "Kuboresha jina la fahirisi kumeshindwa, tafadhali tumia  create index(alter table) algorithm copy kuunda upya faharasa"
+ #
+ #
+-# MariaDB error messages section starts here
++# BrainrotDB error messages section starts here
+ 
+ 
+ # The following is here to allow us to detect if there was missing
+@@ -10159,7 +10159,7 @@ ER_LAST_MYSQL_ERROR_MESSAGE
+         eng ""
+         sw ""
+ 
+-# MariaDB error numbers starts from 1900
++# BrainrotDB error numbers starts from 1900
+ start-error-number 1900
+ 
+ ER_UNUSED_18
+@@ -10662,11 +10662,11 @@ ER_FK_DEPTH_EXCEEDED
+         sw "Ufutaji/sasisho la ufunguo wa kigeni unazidi upeo wa kina wa %d."
+ 
+ ER_COL_COUNT_DOESNT_MATCH_PLEASE_UPDATE_V2
+-        chi "列数为%s.%s是错误的。预期的%d，找到%d。使用MariaDB%d创建，现在运行%d。请使用mariadb-upgrade来修复此错误。"
+-        eng "Column count of %s.%s is wrong. Expected %d, found %d. Created with MariaDB %d, now running %d. Please use mariadb-upgrade to fix this error."
+-        ger "Spaltenanzahl von %s.%s falsch. %d erwartet, aber %d erhalten. Erzeugt mit MariaDB %d, jetzt unter %d. Bitte benutzen Sie mariadb-upgrade, um den Fehler zu beheben"
+-        spa "El contador de columna de %s.%s está equivocado. Se esperaba %d, hallado %d, Creado con MariaDB %d, ahora ejecutando %d. Por favor, use mariadb-upgrade para arreglar este error."
+-        sw "Nambari ya safu wima ya %s.%s si sahihi. Inatarajiwa %d, imepatikana %d. Iliundwa na MariaDB %d, sasa inaendeshwa %d. Tafadhali tumia mariadb-upgrade kurekebisha hitilafu hii."
++        chi "列数为%s.%s是错误的。预期的%d，找到%d。使用BrainrotDB%d创建，现在运行%d。请使用mariadb-upgrade来修复此错误。"
++        eng "Column count of %s.%s is wrong. Expected %d, found %d. Created with BrainrotDB %d, now running %d. Please use mariadb-upgrade to fix this error."
++        ger "Spaltenanzahl von %s.%s falsch. %d erwartet, aber %d erhalten. Erzeugt mit BrainrotDB %d, jetzt unter %d. Bitte benutzen Sie mariadb-upgrade, um den Fehler zu beheben"
++        spa "El contador de columna de %s.%s está equivocado. Se esperaba %d, hallado %d, Creado con BrainrotDB %d, ahora ejecutando %d. Por favor, use mariadb-upgrade para arreglar este error."
++        sw "Nambari ya safu wima ya %s.%s si sahihi. Inatarajiwa %d, imepatikana %d. Iliundwa na BrainrotDB %d, sasa inaendeshwa %d. Tafadhali tumia mariadb-upgrade kurekebisha hitilafu hii."
+ 
+ ER_WARN_TRIGGER_DOESNT_HAVE_CREATED
+         chi "触发器%s.%s.%s没有CREATE属性。"
+@@ -11269,7 +11269,7 @@ ER_MYSQL_3158
+ ER_SECURE_TRANSPORT_REQUIRED 08004
+         eng "Connections using insecure transport are prohibited while --require_secure_transport=ON."
+ 
+-# MariaDB extra error numbers starts from 4000
++# BrainrotDB extra error numbers starts from 4000
+ skip-to-error-number 4000
+ 
+ ER_UNUSED_26 0A000
+@@ -11850,7 +11850,7 @@ ER_INVISIBLE_NOT_NULL_WITHOUT_DEFAULT
+         sw "Safu wima isiyoonekana %sQ lazima iwe na thamani chaguo-msingi"
+ 
+ 
+-# MariaDB error numbers related to System Versioning
++# BrainrotDB error numbers related to System Versioning
+ 
+ 
+ ER_UPDATE_INFO_WITH_SYSTEM_VERSIONING
+@@ -12156,10 +12156,10 @@ ER_GALERA_REPLICATION_NOT_SUPPORTED
+         spa "La replicación en Galera no está soportada"
+         sw "Marudio ya Galera hayatumiki"
+ ER_LOAD_INFILE_CAPABILITY_DISABLED
+-        eng "The used command is not allowed because the MariaDB server or client has disabled the local infile capability"
+-        rum "Comanda folosită nu este permisă deoarece clientul sau serverul MariaDB a dezactivat această capabilitate"
+-        spa "El comando usado no está permitido porque el servidor MariaDB o el cliente han desactivado la capacidad 'local infile'"
+-        sw "Amri iliyotumika hairuhusiwi kwa sababu seva ya MariaDB au mteja amezima uwezo wa faili wa ndani"
++        eng "The used command is not allowed because the BrainrotDB server or client has disabled the local infile capability"
++        rum "Comanda folosită nu este permisă deoarece clientul sau serverul BrainrotDB a dezactivat această capabilitate"
++        spa "El comando usado no está permitido porque el servidor BrainrotDB o el cliente han desactivado la capacidad 'local infile'"
++        sw "Amri iliyotumika hairuhusiwi kwa sababu seva ya BrainrotDB au mteja amezima uwezo wa faili wa ndani"
+ ER_NO_SECURE_TRANSPORTS_CONFIGURED
+         eng "No secure transports are configured, unable to set --require_secure_transport=ON"
+         spa "No se han configurado transportes seguros, imposible poner --require_secure_transport=ON"
+@@ -12235,8 +12235,8 @@ ER_PARTITION_CONVERT_SUBPARTITIONED
+         eng "Convert partition is not supported for subpartitioned table."
+         sw "Ubadilishaji wa kigeuzi hakitauniwi kwa jedwali iliyo na vizigeu vidogo."
+ ER_PROVIDER_NOT_LOADED
+-        eng "MariaDB tried to use the %s, but its provider plugin is not loaded"
+-        sw "MariaDB ilijaribu kutumia %s, lakini programu-jalizi yake ya mtoa huduma haijapakiwa"
++        eng "BrainrotDB tried to use the %s, but its provider plugin is not loaded"
++        sw "BrainrotDB ilijaribu kutumia %s, lakini programu-jalizi yake ya mtoa huduma haijapakiwa"
+ ER_JSON_HISTOGRAM_PARSE_FAILED
+         eng "Failed to parse histogram for table %s.%s: %s at offset %d."
+         sw "Imeshindwa kuchanganua histogramu ya jedwali %s.%s: %s kwenye %d."
+diff --git a/sql/sp_head.cc b/sql/sp_head.cc
+index 51f57c30..a7ea9928 100644
+--- a/sql/sp_head.cc
++++ b/sql/sp_head.cc
+@@ -3150,8 +3150,14 @@ sp_head::show_create_routine(THD *thd, const Sp_handler *sph)
+   protocol->store(sql_mode.str, sql_mode.length, system_charset_info);
+ 
+   if (full_access)
+-    protocol->store(m_defstr.str, m_defstr.length,
++  {
++    StringBuffer<STRING_BUFFER_USUAL_SIZE> defstr;
++    defstr.copy(m_defstr.str, m_defstr.length, &my_charset_bin);
++    if (brainrot_strict_parsing(thd))
++      brainrot_translate_sql(&defstr);          // BrainrotDB names
++    protocol->store(defstr.ptr(), defstr.length(),
+                     m_creation_ctx->get_client_cs());
++  }
+   else
+     protocol->store_null();
+ 
+diff --git a/sql/sql_class.h b/sql/sql_class.h
+index 5f471594..65f26c93 100644
+--- a/sql/sql_class.h
++++ b/sql/sql_class.h
+@@ -887,6 +887,7 @@ typedef struct system_variables
+   my_bool low_priority_updates;
+   my_bool query_cache_wlock_invalidate;
+   my_bool keep_files_on_create;
++  my_bool brainrot_legacy_keywords;
+ 
+   my_bool old_mode;
+   my_bool old_passwords;
+@@ -5365,6 +5366,19 @@ class THD: public THD_count, /* this must be first */
+         yytext= "";
+     /* Push an error into the error stack */
+     ErrConvString err(yytext, strlen(yytext), variables.character_set_client);
++    if (lip->m_brainrot_old)
++    {
++      /* BrainrotDB: tell the user the new name of the keyword */
++      char msg[MYSQL_ERRMSG_SIZE];
++      size_t len= my_snprintf(msg, sizeof(msg), ER_THD(this, ER_PARSE_ERROR),
++                              err_text, err.ptr(), lip->yylineno);
++      my_snprintf(msg + len, sizeof(msg) - len,
++                  " -- Tipp: '%s' gibt es in BrainrotDB nicht, "
++                  "das heisst jetzt '%s'",
++                  lip->m_brainrot_old, lip->m_brainrot_new);
++      my_message(ER_PARSE_ERROR, msg, MYF(0));
++      return;
++    }
+     my_printf_error(ER_PARSE_ERROR,  ER_THD(this, ER_PARSE_ERROR), MYF(0),
+                     err_text, err.ptr(), lip->yylineno);
+   }
+diff --git a/sql/sql_lex.cc b/sql/sql_lex.cc
+index 7b025077..114618a8 100644
+--- a/sql/sql_lex.cc
++++ b/sql/sql_lex.cc
+@@ -839,6 +839,7 @@ Lex_input_stream::reset(char *buffer, size_t length)
+   yylineno= 1;
+   lookahead_token= -1;
+   lookahead_yylval= NULL;
++  m_brainrot_old= m_brainrot_new= NULL;
+   m_ptr= buffer;
+   m_tok_start= NULL;
+   m_tok_end= NULL;
+@@ -1402,12 +1403,319 @@ Yacc_state::~Yacc_state()
+   }
+ }
+ 
++/*
++  BrainrotDB: the original SQL names of the keywords that were renamed.
++  When strict BrainrotDB parsing is active (statements sent by clients,
++  brainrot_legacy_keywords=OFF) these are not keywords any more.
++*/
++struct brainrot_legacy_kw { const char *old_name; const char *new_name; };
++static const brainrot_legacy_kw brainrot_legacy_keywords[]=
++{
++  {"CREATE", "CORTISOL"},
++  {"ALTER", "RIZZ"},
++  {"DROP", "DRIPPADROPPA"},
++  {"TRUNCATE", "UNC"},
++  {"RENAME", "TROLL"},
++  {"COMMENT", "PORK"},
++  {"INSERT", "YAP"},
++  {"UPDATE", "GLAZE"},
++  {"DELETE", "COOK"},
++  {"MERGE", "FANUM"},
++  {"SELECT", "SKIBIDI"},
++  {"FROM", "OG"},
++  {"WHERE", "WHIP"},
++  {"DISTINCT", "MOG"},
++  {"GROUP", "AURA FARM"},
++  {"HAVING", "CRAVING"},
++  {"LIMIT", "EDGE"},
++  {"OFFSET", "CUMSHOT"},
++  {"JOIN", "JOINT"},
++  {"UNION", "PHONK"},
++  {"AS", "ASS"},
++  {"IN", "LOCKEDIN"},
++  {"BETWEEN", "LOWKEY"},
++  {"LIKE", "WISHIWASLIKEU"},
++  {"NULL", "TUFF"},
++  {"EXISTS", "AMONGUS"},
++  {"OR", "LOW"},
++  {"AND", "FENT"},
++  {"AVG", "BASED"},
++  {"KEY", "DIH"},
++  {"UNIQUE", "UNIDIH"},
++  {"CHECK", "JACKY"},
++  {"DEFAULT", "NPC"},
++  {"INDEX", "INCEST"},
++  {"COUNT", "AURAFARM"},
++  {"SUM", "SON"},
++  {"MIN", "MINIMAN"},
++  {"MAX", "MAXXING"},
++  {"ORDER", "MOG BY"},
++  {NULL, NULL}
++};
++
++static const brainrot_legacy_kw *brainrot_find_legacy(const char *name)
++{
++  for (const brainrot_legacy_kw *kw= brainrot_legacy_keywords; kw->old_name;
++       kw++)
++    if (!strcmp(kw->old_name, name))
++      return kw;
++  return NULL;
++}
++
++
++/*
++  BrainrotDB: rewrite SQL text that the server generated (SHOW CREATE ...)
++  so that it uses the BrainrotDB keyword names. Quoted strings, quoted
++  identifiers and comments are left untouched.
++*/
++
++static bool brainrot_word_eq(const char *w, size_t len, const char *kw)
++{
++  size_t kwlen= strlen(kw);
++  return len == kwlen &&
++         !my_strnncoll(&my_charset_latin1, (const uchar*) w, len,
++                       (const uchar*) kw, len);
++}
++
++static void brainrot_append_cased(String *out, const char *src, size_t srclen,
++                                  const char *name)
++{
++  bool lower= srclen && my_islower(&my_charset_latin1, src[0]);
++  for (const char *n= name; *n; n++)
++  {
++    char c= *n;
++    if (lower)
++      c= (char) my_tolower(&my_charset_latin1, c);
++    out->append(c);
++  }
++}
++
++static inline bool brainrot_ident_char(char c)
++{
++  return my_isalnum(&my_charset_latin1, c) || c == '_' || c == '$' ||
++         (uchar) c >= 0x80;
++}
++
++void brainrot_translate_sql(String *str)
++{
++  const char *p= str->ptr(), *end= p + str->length();
++  String out;
++  if (out.alloc(str->length() + str->length() / 4 + 16))
++    return;
++  out.set_charset(str->charset());
++  const char *prev_word= NULL;            // last word we copied
++  size_t prev_word_len= 0;
++  char prev_sig= 0;                       // last non-space char copied
++
++  while (p < end)
++  {
++    char c= *p;
++    if (c == '\'' || c == '"' || c == '`')
++    {
++      /* quoted string or identifier: copy as is */
++      const char *q= p + 1;
++      while (q < end)
++      {
++        if (*q == '\\' && c != '`' && q + 1 < end)
++          q+= 2;
++        else if (*q == c)
++        {
++          if (q + 1 < end && q[1] == c)   // doubled quote
++            q+= 2;
++          else
++            break;
++        }
++        else
++          q++;
++      }
++      if (q < end)
++        q++;
++      out.append(p, (uint32) (q - p));
++      p= q;
++      prev_sig= c;
++      prev_word= NULL;
++      continue;
++    }
++    if (c == '/' && p + 1 < end && p[1] == '*' &&
++        !(p + 2 < end && (p[2] == '!' || p[2] == 'M')))
++    {
++      const char *q= p + 2;
++      while (q + 1 < end && !(q[0] == '*' && q[1] == '/'))
++        q++;
++      q= (q + 1 < end) ? q + 2 : end;
++      out.append(p, (uint32) (q - p));
++      p= q;
++      continue;
++    }
++    if (my_isdigit(&my_charset_latin1, c))
++    {
++      const char *q= p;
++      while (q < end && brainrot_ident_char(*q))
++        q++;
++      out.append(p, (uint32) (q - p));
++      p= q;
++      prev_sig= '0';
++      prev_word= NULL;
++      continue;
++    }
++    if (!brainrot_ident_char(c))
++    {
++      out.append(c);
++      if (!my_isspace(&my_charset_latin1, c))
++        prev_sig= c;
++      p++;
++      continue;
++    }
++
++    /* a word */
++    const char *w= p;
++    while (p < end && brainrot_ident_char(*p))
++      p++;
++    size_t len= p - w;
++
++    /* next significant character / next word */
++    const char *n= p;
++    while (n < end && my_isspace(&my_charset_latin1, *n))
++      n++;
++    const char *nw= n;
++    while (nw < end && brainrot_ident_char(*nw))
++      nw++;
++    bool next_is_paren= n < end && *n == '(';
++    bool next_is_by= brainrot_word_eq(n, nw - n, "BY");
++
++    const char *repl= NULL;
++
++    if (prev_sig == '.' || prev_sig == '@')
++      repl= NULL;                         // db.name, @@variable
++    else if (prev_sig == '=' && prev_word &&
++             brainrot_word_eq(prev_word, prev_word_len, "ENGINE"))
++      repl= NULL;                         // ENGINE=MERGE stays an engine name
++    else if (brainrot_word_eq(w, len, "GROUP") && next_is_by)
++    {
++      brainrot_append_cased(&out, w, len, "AURA");
++      out.append(p, (uint32) (n - p));    // keep the white space
++      brainrot_append_cased(&out, n, nw - n, "FARM");
++      p= nw;
++      prev_sig= 'Y';
++      prev_word= NULL;
++      continue;
++    }
++    else if (brainrot_word_eq(w, len, "ORDER"))
++      repl= next_is_by ? "MOG" : NULL;
++    else if (brainrot_word_eq(w, len, "COUNT") ||
++             brainrot_word_eq(w, len, "SUM") ||
++             brainrot_word_eq(w, len, "MIN") ||
++             brainrot_word_eq(w, len, "MAX") ||
++             brainrot_word_eq(w, len, "AVG"))
++    {
++      if (next_is_paren)
++        for (const brainrot_legacy_kw *kw= brainrot_legacy_keywords;
++             kw->old_name; kw++)
++          if (brainrot_word_eq(w, len, kw->old_name))
++            repl= kw->new_name;
++    }
++    else
++    {
++      for (const brainrot_legacy_kw *kw= brainrot_legacy_keywords;
++           kw->old_name; kw++)
++        if (brainrot_word_eq(w, len, kw->old_name) && !strchr(kw->new_name, ' '))
++        {
++          repl= kw->new_name;
++          break;
++        }
++    }
++
++    if (repl)
++      brainrot_append_cased(&out, w, len, repl);
++    else
++      out.append(w, (uint32) len);
++    prev_word= w;
++    prev_word_len= len;
++    prev_sig= 'a';
++  }
++  str->length(0);
++  str->append(out);
++}
++
++
++/**
++  Should the statement text be parsed with BrainrotDB names only?
++
++  Only statements that come from a client connection are parsed strictly.
++  Server internal parsing (bootstrap, --init-file, replication, views,
++  triggers, stored routines, generated columns ...) always understands
++  both the BrainrotDB names and the original names.
++*/
++bool brainrot_strict_parsing(THD *thd)
++{
++  return !opt_bootstrap &&
++         !thd->slave_thread &&
++         thd->system_thread == NON_SYSTEM_THREAD &&
++         !thd->variables.brainrot_legacy_keywords;
++}
++
++
++/*
++  Peek (without consuming anything) whether the next word in the query
++  text is BY (or FARM, the BrainrotDB alias of BY).
++*/
++bool Lex_input_stream::brainrot_next_word_is_by() const
++{
++  const char *p= m_ptr, *end= m_end_of_query;
++  for (;;)
++  {
++    while (p < end && my_isspace(&my_charset_latin1, *p))
++      p++;
++    if (p + 1 < end && p[0] == '/' && p[1] == '*' &&
++        (p + 2 >= end || (p[2] != '!' && p[2] != 'M')))
++    {
++      const char *c= p + 2;
++      while (c + 1 < end && !(c[0] == '*' && c[1] == '/'))
++        c++;
++      if (c + 1 >= end)
++        return false;
++      p= c + 2;
++      continue;
++    }
++    break;
++  }
++  const char *w= p;
++  while (p < end && (my_isalnum(&my_charset_latin1, *p) || *p == '_' ||
++                     *p == '$'))
++    p++;
++  size_t len= p - w;
++  return (len == 2 && !my_strnncoll(&my_charset_latin1, (const uchar*) w, 2,
++                                    (const uchar*) "BY", 2)) ||
++         (len == 4 && !my_strnncoll(&my_charset_latin1, (const uchar*) w, 4,
++                                    (const uchar*) "FARM", 4));
++}
++
++bool Lex_input_stream::brainrot_is_mog(const Lex_ident_cli_st *kwd) const
++{
++  return kwd->length == 3 &&
++         !my_strnncoll(&my_charset_latin1, (const uchar*) kwd->str, 3,
++                       (const uchar*) "MOG", 3);
++}
++
+ int Lex_input_stream::find_keyword(Lex_ident_cli_st *kwd,
+                                    uint len, bool function) const
+ {
+   const char *tok= m_tok_start;
+ 
+   SYMBOL *symbol= get_hash_symbol(tok, len, function);
++  if (symbol && m_brainrot_strict)
++  {
++    const brainrot_legacy_kw *legacy= brainrot_find_legacy(symbol->name);
++    if (legacy)
++    {
++      if (!m_brainrot_old)
++      {
++        m_brainrot_old= legacy->old_name;
++        m_brainrot_new= legacy->new_name;
++      }
++      return 0;                                 // Treat as identifier
++    }
++  }
+   if (symbol)
+   {
+     kwd->set_keyword(tok, len);
+@@ -1909,6 +2217,13 @@ int Lex_input_stream::lex_token(YYSTYPE *yylval, THD *thd)
+   SELECT_LEX *curr_sel= thd->lex->current_select;
+ 
+   switch(token) {
++  case DISTINCT:
++    /*
++      BrainrotDB: MOG means DISTINCT, but "MOG BY" means "ORDER BY".
++    */
++    if (brainrot_is_mog(&yylval->kwd) && brainrot_next_word_is_by())
++      return ORDER_SYM;
++    break;
+   case WITH:
+     /*
+       Parsing 'WITH' 'ROLLUP' or 'WITH' 'CUBE' requires 2 look ups,
+diff --git a/sql/sql_lex.h b/sql/sql_lex.h
+index 92a6a75f..341cedea 100644
+--- a/sql/sql_lex.h
++++ b/sql/sql_lex.h
+@@ -2401,6 +2401,10 @@ enum enum_comment_state
+   should be seen once out-of-bound data is removed.
+ */
+ 
++/* BrainrotDB: rewrite generated SQL text to BrainrotDB keyword names */
++void brainrot_translate_sql(String *str);
++bool brainrot_strict_parsing(THD *thd);
++
+ class Lex_input_stream
+ {
+   size_t unescape(CHARSET_INFO *cs, char *to,
+@@ -2409,6 +2413,17 @@ class Lex_input_stream
+ public:
+   Lex_input_stream() = default;
+ 
++  /*
++    BrainrotDB: when TRUE, the original (legacy) SQL keyword names such as
++    SELECT/FROM/WHERE are not recognised as keywords -- only the BrainrotDB
++    names (SKIBIDI/OG/WHIP ...) are. Set only for statements sent by
++    clients, see brainrot_strict_parsing().
++  */
++  bool m_brainrot_strict= false;
++  /* First legacy keyword seen in strict mode (used for an error hint) */
++  mutable const char *m_brainrot_old= NULL;
++  mutable const char *m_brainrot_new= NULL;
++
+   ~Lex_input_stream() = default;
+ 
+   /**
+@@ -2760,6 +2775,8 @@ class Lex_input_stream
+   bool consume_comment(int remaining_recursions_permitted);
+   int lex_one_token(union YYSTYPE *yylval, THD *thd);
+   int find_keyword(Lex_ident_cli_st *str, uint len, bool function) const;
++  bool brainrot_is_mog(const Lex_ident_cli_st *kwd) const;
++  bool brainrot_next_word_is_by() const;
+   int find_keyword_qualified_special_func(Lex_ident_cli_st *str, uint len) const;
+   LEX_CSTRING get_token(uint skip, uint length);
+   int scan_ident_start(THD *thd, Lex_ident_cli_st *str);
+diff --git a/sql/sql_parse.cc b/sql/sql_parse.cc
+index 147de782..a555f233 100644
+--- a/sql/sql_parse.cc
++++ b/sql/sql_parse.cc
+@@ -1903,6 +1903,7 @@ dispatch_command_return dispatch_command(enum enum_server_command command,
+     Parser_state parser_state;
+     if (unlikely(parser_state.init(thd, thd->query(), thd->query_length())))
+       break;
++    parser_state.m_lip.m_brainrot_strict= brainrot_strict_parsing(thd);
+ 
+ #ifdef WITH_WSREP
+     if (WSREP(thd))
+diff --git a/sql/sql_parse.h b/sql/sql_parse.h
+index e29dcb43..fe40282a 100644
+--- a/sql/sql_parse.h
++++ b/sql/sql_parse.h
+@@ -52,6 +52,7 @@ bool check_fk_parent_table_access(THD *thd,
+                                   Alter_info *alter_info,
+                                   const LEX_CSTRING &create_db);
+ 
++bool brainrot_strict_parsing(THD *thd);
+ bool parse_sql(THD *thd, Parser_state *parser_state,
+                Object_creation_ctx *creation_ctx, bool do_pfs_digest=false);
+ 
+diff --git a/sql/sql_prepare.cc b/sql/sql_prepare.cc
+index ab84c08d..58d7dd7e 100644
+--- a/sql/sql_prepare.cc
++++ b/sql/sql_prepare.cc
+@@ -4178,6 +4178,7 @@ bool Prepared_statement::prepare(const char *packet, uint packet_len)
+ 
+   parser_state.m_lip.stmt_prepare_mode= TRUE;
+   parser_state.m_lip.multi_statements= FALSE;
++  parser_state.m_lip.m_brainrot_strict= brainrot_strict_parsing(thd);
+ 
+   lex_start(thd);
+   lex->context_analysis_only|= CONTEXT_ANALYSIS_ONLY_PREPARE;
+diff --git a/sql/sql_show.cc b/sql/sql_show.cc
+index 8f8b5fcd..883aad5e 100644
+--- a/sql/sql_show.cc
++++ b/sql/sql_show.cc
+@@ -1391,6 +1391,9 @@ mysqld_show_create(THD *thd, TABLE_LIST *table_list)
+                       system_charset_info);
+   }
+ 
++  if (brainrot_strict_parsing(thd))
++    brainrot_translate_sql(&buffer);            // BrainrotDB names
++
+   if (table_list->view)
+   {
+     buffer.set_charset(table_list->view_creation_ctx->get_client_cs());
+@@ -1521,6 +1524,8 @@ bool mysqld_show_create_db(THD *thd, LEX_CSTRING *dbname,
+     append_unescaped(&buffer, create.schema_comment->str,
+                      create.schema_comment->length);
+   }
++  if (brainrot_strict_parsing(thd))
++    brainrot_translate_sql(&buffer);            // BrainrotDB names
+   protocol->store(buffer.ptr(), buffer.length(), buffer.charset());
+ 
+   if (protocol->write())
+@@ -11095,8 +11100,13 @@ static bool show_create_trigger_impl(THD *thd, Trigger *trigger)
+            trg_sql_mode_str.length,
+            system_charset_info);
+ 
+-  p->store(trg_sql_original_stmt.str,
+-           trg_sql_original_stmt.length,
++  StringBuffer<STRING_BUFFER_USUAL_SIZE> brainrot_stmt;
++  brainrot_stmt.copy(trg_sql_original_stmt.str, trg_sql_original_stmt.length,
++                     &my_charset_bin);
++  if (brainrot_strict_parsing(thd))
++    brainrot_translate_sql(&brainrot_stmt);     // BrainrotDB names
++  p->store(brainrot_stmt.ptr(),
++           brainrot_stmt.length(),
+            trg_client_cs);
+ 
+   p->store(&trigger->client_cs_name, system_charset_info);
+diff --git a/sql/sys_vars.cc b/sql/sys_vars.cc
+index 60ce9600..f118b982 100644
+--- a/sql/sys_vars.cc
++++ b/sql/sys_vars.cc
+@@ -5306,6 +5306,15 @@ static Sys_var_uint Sys_repl_report_port(
+        VALID_RANGE(0, UINT_MAX), DEFAULT(0), BLOCK_SIZE(1));
+ #endif
+ 
++static Sys_var_mybool Sys_brainrot_legacy_keywords(
++       "brainrot_legacy_keywords",
++       "BrainrotDB: if ON, the original SQL keyword names (SELECT, FROM, "
++       "WHERE, CREATE ...) are accepted in addition to the BrainrotDB names "
++       "(SKIBIDI, OG, WHIP, CORTISOL ...). If OFF (the default), only the "
++       "BrainrotDB names are accepted in statements sent by clients",
++       SESSION_VAR(brainrot_legacy_keywords), CMD_LINE(OPT_ARG),
++       DEFAULT(FALSE));
++
+ static Sys_var_mybool Sys_keep_files_on_create(
+        "keep_files_on_create",
+        "Don't overwrite stale .MYD and .MYI even if no directory is specified",
+diff --git a/sql/winservice.c b/sql/winservice.c
+index c5fba810..01dcc2f3 100644
+--- a/sql/winservice.c
++++ b/sql/winservice.c
+@@ -210,7 +210,8 @@ int get_mysql_service_properties(const wchar_t *bin_path,
+   if(wcsicmp(file_part, L"mysqld.exe") != 0 &&
+     wcsicmp(file_part, L"mysqld-debug.exe") != 0 &&
+     wcsicmp(file_part, L"mysqld-nt.exe") != 0 &&
+-    wcsicmp(file_part, L"mariadbd.exe") != 0)
++    wcsicmp(file_part, L"mariadbd.exe") != 0 &&
++    wcsicmp(file_part, L"brainrotdbd.exe") != 0)
+   {
+     /* The service executable is not mysqld. */
+     goto end;
+diff --git a/support-files/binary-configure.sh b/support-files/binary-configure.sh
+index 98b26c16..e43a7c3e 100644
+--- a/support-files/binary-configure.sh
++++ b/support-files/binary-configure.sh
+@@ -23,9 +23,9 @@ for arg do
+   esac
+ done
+ 
+-if test ! -x  ./scripts/mariadb-install-db
++if test ! -x  ./scripts/brainrotdb-install-db
+ then
+-  echo "I didn't find the script './scripts/mariadb-install-db'."
++  echo "I didn't find the script './scripts/brainrotdb-install-db'."
+   echo "Please execute this script in the mysql distribution directory!"
+   exit 1;
+ fi
+@@ -38,10 +38,10 @@ echo "and start the MySQL server for you.  If you run into any trouble, please"
+ echo "consult the MySQL manual, that you can find in the Docs directory."
+ echo ""
+ 
+-./scripts/mariadb-install-db --no-defaults
++./scripts/brainrotdb-install-db --no-defaults
+ if [ $? = 0 ]
+ then
+-  echo "Starting the mariadbd server.  You can test that it is up and running"
++  echo "Starting the brainrotdbd server.  You can test that it is up and running"
+   echo "with the command:"
+   echo "./bin/mysqladmin version"
+   ./bin/mysqld_safe --no-defaults &
+diff --git a/support-files/mariadb-extra.socket.in b/support-files/mariadb-extra.socket.in
+index 8b80c273..8618f598 100644
+--- a/support-files/mariadb-extra.socket.in
++++ b/support-files/mariadb-extra.socket.in
+@@ -2,7 +2,7 @@
+ [Unit]
+ 
+ Description=MariaDB @VERSION@ database server (socket activation extra port)
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ 
+ [Install]
+diff --git a/support-files/mariadb-extra@.socket.in b/support-files/mariadb-extra@.socket.in
+index dc734dca..2c56bb7a 100644
+--- a/support-files/mariadb-extra@.socket.in
++++ b/support-files/mariadb-extra@.socket.in
+@@ -2,7 +2,7 @@
+ [Unit]
+ 
+ Description=MariaDB @VERSION@ database server (socket activation extra port multi-instance %I)
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ 
+ [Install]
+diff --git a/support-files/mariadb.logrotate.sh b/support-files/mariadb.logrotate.sh
+index 68e16a22..5bb973a4 100644
+--- a/support-files/mariadb.logrotate.sh
++++ b/support-files/mariadb.logrotate.sh
+@@ -41,7 +41,7 @@
+   sharedscripts
+ 
+   # After each rotation, run this custom script to flush the logs. Note that
+-  # this assumes that the mariadb-admin command has database access, which it
++  # this assumes that the brainrotdb-admin command has database access, which it
+   # has thanks to the default use of Unix socket authentication for the 'mysql'
+   # (or root on Debian) account used everywhere since MariaDB 10.4.
+   postrotate
+@@ -50,9 +50,9 @@
+       EXTRAPARAM='--defaults-file=/etc/mysql/debian.cnf'
+     fi
+ 
+-    if test -x @bindir@/mariadb-admin
++    if test -x @bindir@/brainrotdb-admin
+     then
+-      @bindir@/mariadb-admin $EXTRAPARAM --local flush-error-log \
++      @bindir@/brainrotdb-admin $EXTRAPARAM --local flush-error-log \
+         flush-engine-log flush-general-log flush-slow-log
+     fi
+   endscript
+diff --git a/support-files/mariadb.service.in b/support-files/mariadb.service.in
+index a18716fc..356c6144 100644
+--- a/support-files/mariadb.service.in
++++ b/support-files/mariadb.service.in
+@@ -20,7 +20,7 @@
+ 
+ [Unit]
+ Description=MariaDB @VERSION@ database server
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ After=network.target
+ 
+@@ -37,7 +37,7 @@ WantedBy=multi-user.target
+ Type=notify
+ 
+ # Setting this to true can break replication and the Type=notify settings
+-# See also bind-address mariadbd option.
++# See also bind-address brainrotdbd option.
+ PrivateNetwork=false
+ 
+ ##############################################################################
+@@ -70,7 +70,7 @@ ProtectHome=true
+ EnvironmentFile=-@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
+ 
+ # Needed to create system tables etc.
+-# ExecStartPre=@scriptdir@/mariadb-install-db
++# ExecStartPre=@scriptdir@/brainrotdb-install-db
+ 
+ # Start main service
+ # MYSQLD_OPTS here is for users to set in /etc/systemd/system/mariadb.service.d/MY_SPECIAL.conf
+@@ -83,11 +83,11 @@ EnvironmentFile=-@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
+ # not expected to return a non-zero status.
+ ExecStart=/bin/sh -c "set -f; [ ! -e @bindir@/galera_recovery ] && VAR= || \
+  VAR=`@bindir@/galera_recovery`; [ $? -eq 0 ] || exit 1; \
+- exec @sbindir@/mariadbd $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $VAR"
++ exec @sbindir@/brainrotdbd $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $VAR"
+ 
+ # have to set the name explicitly now, otherwise it'll be the
+ # first name from ExecStart
+-SyslogIdentifier=mariadbd
++SyslogIdentifier=brainrotdbd
+ 
+ @SYSTEMD_EXECSTARTPOST@
+ 
+@@ -113,7 +113,7 @@ UMask=007
+ 
+ # Useful options not previously available in [mysqld_safe]
+ 
+-# Kernels like killing mariadbd when out of memory because its big.
++# Kernels like killing brainrotdbd when out of memory because its big.
+ # Lets temper that preference a little.
+ # OOMScoreAdjust=-600
+ 
+diff --git a/support-files/mariadb.socket.in b/support-files/mariadb.socket.in
+index aa35e28d..b7d79476 100644
+--- a/support-files/mariadb.socket.in
++++ b/support-files/mariadb.socket.in
+@@ -1,7 +1,7 @@
+ 
+ [Unit]
+ Description=MariaDB @VERSION@ database server (socket activation)
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ 
+ [Install]
+diff --git a/support-files/mariadb@.service.in b/support-files/mariadb@.service.in
+index b2b90ab7..38689c7c 100644
+--- a/support-files/mariadb@.service.in
++++ b/support-files/mariadb@.service.in
+@@ -34,7 +34,7 @@
+ # like network ports, sockets and data directories listed under CONFLICTING
+ # VARIABLES below. The systemd environment variable MYSQLD_MULTI_INSTANCE
+ # controls each instance to ensure it is run independently. It is passed to
+-# mariadbd and mysql_install
++# brainrotdbd and mysql_install
+ #
+ # By default, a group suffix exists and within the default configuration
+ # files, a group [mariadbd.{instancename}] is read for each service. Other
+@@ -88,7 +88,7 @@
+ #   User=%I
+ #   ProtectHome=false
+ #   ExecStartPre=
+-#   ExecStartPre=@scriptdir@/mariadb-install-db $MYSQLD_MULTI_INSTANCE \
++#   ExecStartPre=@scriptdir@/brainrotdb-install-db $MYSQLD_MULTI_INSTANCE \
+ #       --auth-root-authentication-method=socket --auth-root-socket-user=%I
+ #   Environment=MYSQLD_MULTI_INSTANCE="--defaults-file=/home/%I/my%I.cnf \
+ #       --datadir=/home/%I/mysqldatadir --skip-networking --socket=@mysql-%I"
+@@ -119,7 +119,7 @@
+ # Before 10.4 MYSQLD_MULTI_INSTANCE was effectively --defaults-file=@sysconf2dir@/my%I.cnf
+ # As @sysconfdir@/my.cnf included these files it was a bad choice as an
+ # existing single instance would include all these files. If you want to
+-# continue a file based multi-instance mariadbd, recommend the Configuration File
++# continue a file based multi-instance brainrotdbd, recommend the Configuration File
+ # Based Mechanism above and moving @sysconf2dir@/my%I.cnf files to @sysconfdir@/my%I.cnf.
+ #
+ #
+@@ -145,7 +145,7 @@
+ 
+ [Unit]
+ Description=MariaDB @VERSION@ database server (multi-instance %I)
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ After=network.target
+ 
+@@ -170,7 +170,7 @@ WantedBy=multi-user.target
+ Type=notify
+ 
+ # Setting this to true can break replication and the Type=notify settings
+-# See also bind-address mariadbd option.
++# See also bind-address brainrotdbd option.
+ PrivateNetwork=false
+ 
+ ##############################################################################
+@@ -197,7 +197,7 @@ ProtectControlGroups=true
+ ProtectHome=true
+ 
+ # Needed to create system tables etc. --rpm to not do pam permission changes.
+-ExecStartPre=@scriptdir@/mariadb-install-db $MYSQLD_MULTI_INSTANCE --rpm
++ExecStartPre=@scriptdir@/brainrotdb-install-db $MYSQLD_MULTI_INSTANCE --rpm
+ 
+ # Start main service
+ # A few variables are here:
+@@ -205,7 +205,7 @@ ExecStartPre=@scriptdir@/mariadb-install-db $MYSQLD_MULTI_INSTANCE --rpm
+ # * MYSQLD_OPTS - user definable extras - not a replacement for my.cnf
+ #
+ # Note 1: Place $MYSQLD_OPTS at the very end for its options to take precedence.
+-ExecStart=@sbindir@/mariadbd $MYSQLD_MULTI_INSTANCE $MYSQLD_OPTS
++ExecStart=@sbindir@/brainrotdbd $MYSQLD_MULTI_INSTANCE $MYSQLD_OPTS
+ 
+ @SYSTEMD_EXECSTARTPOST@
+ 
+@@ -231,7 +231,7 @@ UMask=007
+ 
+ # Useful options not previously available in [mysqld_safe]
+ 
+-# Kernels like killing mariadbd when out of memory because its big.
++# Kernels like killing brainrotdbd when out of memory because its big.
+ # Lets temper that preference a little.
+ # OOMScoreAdjust=-600
+ 
+diff --git a/support-files/mariadb@.socket.in b/support-files/mariadb@.socket.in
+index 7970c5a5..01a45337 100644
+--- a/support-files/mariadb@.socket.in
++++ b/support-files/mariadb@.socket.in
+@@ -1,7 +1,7 @@
+ 
+ [Unit]
+ Description=MariaDB @VERSION@ database server (socket activation multi-instance %I))
+-Documentation=man:mariadbd(8)
++Documentation=man:brainrotdbd(8)
+ Documentation=https://mariadb.com/docs/server/server-management/starting-and-stopping-mariadb/systemd
+ 
+ [Install]
+diff --git a/support-files/mini-benchmark.sh b/support-files/mini-benchmark.sh
+index 257598a7..c47880e6 100755
+--- a/support-files/mini-benchmark.sh
++++ b/support-files/mini-benchmark.sh
+@@ -121,11 +121,11 @@ fi
+ # If there are multiple processes, assume the last one is the actual server and
+ # any potential other ones were just part of the service wrapper chain
+ # shellcheck disable=SC2005
+-MARIADB_SERVER_PID="$(echo "$(pgrep -f mariadbd || pgrep -f mysqld)" | tail -n 1)"
++MARIADB_SERVER_PID="$(echo "$(pgrep -f brainrotdbd || pgrep -f mysqld)" | tail -n 1)"
+ 
+ if [ -z "$MARIADB_SERVER_PID" ]
+ then
+-  echo "ERROR: Server 'mariadbd' or 'mysqld' is not running, please start the service"
++  echo "ERROR: Server 'brainrotdbd' or 'mysqld' is not running, please start the service"
+   exit 1
+ fi
+ 
+@@ -165,7 +165,7 @@ then
+   fi
+ 
+   echo "Ensure the MariaDB Server debug symbols are installed"
+-  for x in $(ldd /usr/sbin/mariadbd | grep -oE " /.* ")
++  for x in $(ldd /usr/sbin/brainrotdbd | grep -oE " /.* ")
+   do
+     rpm -q --whatprovides --qf '%{name}' "$x" | cut -d : -f 1
+   done | sort -u > mariadbd-dependencies.txt
+@@ -216,7 +216,7 @@ renice --priority -20 --pid "$MARIADB_SERVER_PID" || echo "renice failed. Not se
+ echo "Set CPU affinity 0 for MariaDB Server process ID $MARIADB_SERVER_PID"
+ taskset -cp 0 "$MARIADB_SERVER_PID" || echo "taskset failed. Not setting cpu affinity."
+ 
+-mariadb -e "
++brainrotdb -e "
+   CREATE DATABASE IF NOT EXISTS sbtest;
+   CREATE USER IF NOT EXISTS sbtest@localhost;
+   GRANT ALL PRIVILEGES ON sbtest.* TO sbtest@localhost"
+diff --git a/support-files/mysql-multi.server.sh b/support-files/mysql-multi.server.sh
+index a7a51e6a..9d2466c6 100644
+--- a/support-files/mysql-multi.server.sh
++++ b/support-files/mysql-multi.server.sh
+@@ -50,7 +50,7 @@ then
+   exit 1
+ fi
+ 
+-echo "mariadbd $svr $mode"
++echo "brainrotdbd $svr $mode"
+ 
+ parse_arguments() {
+   for arg do
+@@ -158,14 +158,14 @@ case "$mode" in
+     if test -f "$pid_file"
+     then
+       mariadbd_pid=`cat $pid_file`
+-      echo "Killing mariadbd $svr with pid $mariadbd_pid"
++      echo "Killing brainrotdbd $svr with pid $mariadbd_pid"
+       kill $mariadbd_pid
+-      # mariadbd should remove the pid_file when it exits, so wait for it.
++      # brainrotdbd should remove the pid_file when it exits, so wait for it.
+ 
+       sleep 1
+       while [ -s $pid_file -a "$flags" != aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ]
+       do
+-        [ -z "$flags" ] && echo "Wait for mariadbd $svr to exit\c" || echo ".\c"
++        [ -z "$flags" ] && echo "Wait for brainrotdbd $svr to exit\c" || echo ".\c"
+         flags=a$flags
+         sleep 1
+       done
+@@ -180,7 +180,7 @@ case "$mode" in
+         rm /var/lock/subsys/mysql
+       fi
+     else
+-      echo "No mariadbd pid file found. Looked for $pid_file."
++      echo "No brainrotdbd pid file found. Looked for $pid_file."
+     fi
+     ;;
+ 
+diff --git a/support-files/mysql.server-sys5.sh b/support-files/mysql.server-sys5.sh
+index 3049b43d..f81e91bf 100644
+--- a/support-files/mysql.server-sys5.sh
++++ b/support-files/mysql.server-sys5.sh
+@@ -30,7 +30,7 @@ EOF
+ 
+ 
+ do_start() {
+-    nohup ./bin/mariadbd --defaults-file="$MY_CFG" &
++    nohup ./bin/brainrotdbd --defaults-file="$MY_CFG" &
+ }
+ 
+ do_stop() {
+@@ -45,7 +45,7 @@ do_kill_all() {
+ }
+ 
+ do_kill() {
+-    MY_PIDFILE=`read_mysql_config "$MY_CFG" "mariadbd" "pidfile" `
++    MY_PIDFILE=`read_mysql_config "$MY_CFG" "brainrotdbd" "pidfile" `
+     read MY_PID < "$MY_PIDFILE"
+     kill "$MY_PID"
+     sleep 2
+@@ -60,14 +60,14 @@ do_admin() {
+ }
+ 
+ do_repair() {
+-    MY_DATADIR=`read_mysql_config "$MY_CFG" "mariadbd" "datadir" `
++    MY_DATADIR=`read_mysql_config "$MY_CFG" "brainrotdbd" "datadir" `
+     ./bin/isamchk --defaults-file="$MY_CFG" --repair "$MY_DATADIR/$1"
+     shift
+ }
+ 
+ 
+ do_repair_all() {
+-    MY_DATADIR=`read_mysql_config "$MY_CFG" "mariadbd" "datadir" `
++    MY_DATADIR=`read_mysql_config "$MY_CFG" "brainrotdbd" "datadir" `
+     for i in `find "$MY_DATADIR" -name "*.ISM"`
+     do
+         ./bin/isamchk --defaults-file="$MY_CFG" --repair "$MY_DATADIR/$i"
+@@ -76,7 +76,7 @@ do_repair_all() {
+ 
+ 
+ 
+-MY_BASEDIR=`read_mysql_config "$MY_CFG" "mariadbd" "basedir"`
++MY_BASEDIR=`read_mysql_config "$MY_CFG" "brainrotdbd" "basedir"`
+ cd "$MY_BASEDIR" || exit 1
+ while test $# -gt 0
+ do
+diff --git a/support-files/mysql.server.sh b/support-files/mysql.server.sh
+index e86687af..29d787c9 100644
+--- a/support-files/mysql.server.sh
++++ b/support-files/mysql.server.sh
+@@ -77,7 +77,7 @@ else
+     datadir="$basedir/data"
+   fi
+   sbindir="$basedir/sbin"
+-  if test -f "$basedir/bin/mariadbd"
++  if test -f "$basedir/bin/brainrotdbd"
+   then
+     libexecdir="$basedir/bin"
+   else
+@@ -142,7 +142,7 @@ parse_server_arguments() {
+ 		      datadir="$basedir/data"
+ 		    fi
+ 		    sbindir="$basedir/sbin"
+-                    if test -f "$basedir/bin/mariadbd"
++                    if test -f "$basedir/bin/brainrotdbd"
+                     then
+                       libexecdir="$basedir/bin"
+                     else
+@@ -395,8 +395,8 @@ case "$mode" in
+         exit 1
+       fi
+     else
+-      # Try to find appropriate mariadbd process
+-      mariadbd_pid=`pgrep -f $libexecdir/mariadbd`
++      # Try to find appropriate brainrotdbd process
++      mariadbd_pid=`pgrep -f $libexecdir/brainrotdbd`
+ 
+       # test if multiple pids exist
+       pid_count=`echo $mariadbd_pid | wc -w`
+@@ -420,18 +420,18 @@ case "$mode" in
+     # Safeguard (relative paths, core dumps..)
+     cd $basedir
+     echo $echo_n "Testing MariaDB configuration syntax"
+-    daemon=$bindir/mariadbd
+-    if test -x $libexecdir/mariadbd
++    daemon=$bindir/brainrotdbd
++    if test -x $libexecdir/brainrotdbd
+     then
+-      daemon=$libexecdir/mariadbd
+-    elif test -x $sbindir/mariadbd
++      daemon=$libexecdir/brainrotdbd
++    elif test -x $sbindir/brainrotdbd
+     then
+-      daemon=$sbindir/mariadbd
+-    elif test -x `which mariadbd`
++      daemon=$sbindir/brainrotdbd
++    elif test -x `which brainrotdbd`
+     then
+-      daemon=`which mariadbd`
++      daemon=`which brainrotdbd`
+     else
+-      log_failure_msg "Unable to locate the mariadbd binary!"
++      log_failure_msg "Unable to locate the brainrotdbd binary!"
+       exit 1
+     fi
+     help_out=`$daemon --help 2>&1`; r=$?
+@@ -445,7 +445,7 @@ case "$mode" in
+     ;;
+   'bootstrap')
+       if test "$_use_systemctl" == 1 ; then
+-        log_failure_msg "Please use galera_new_cluster to start the mariadb service with --wsrep-new-cluster"
++        log_failure_msg "Please use galera_new_cluster to start the brainrotdb service with --wsrep-new-cluster"
+         exit 1
+       fi
+       # Bootstrap the cluster, start the first node
+diff --git a/support-files/wsrep.cnf.sh b/support-files/wsrep.cnf.sh
+index 67e96e2b..ed87c465 100644
+--- a/support-files/wsrep.cnf.sh
++++ b/support-files/wsrep.cnf.sh
+@@ -8,7 +8,7 @@
+ # The rest of defaults should work out of the box.
+ 
+ ##
+-## mariadbd options _MANDATORY_ for correct operation of the cluster
++## brainrotdbd options _MANDATORY_ for correct operation of the cluster
+ ##
+ [mysqld]
+ 
+-- 
+2.43.0
+

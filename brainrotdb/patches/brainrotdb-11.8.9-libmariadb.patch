@@ -1,0 +1,21 @@
+diff --git a/libmariadb/mariadb_lib.c b/libmariadb/mariadb_lib.c
+index 24d5d2d..f821794 100644
+--- a/libmariadb/mariadb_lib.c
++++ b/libmariadb/mariadb_lib.c
+@@ -4706,6 +4706,7 @@ ulong STDCALL mysql_hex_string(char *to, const char *from, unsigned long len)
+ my_bool STDCALL mariadb_connection(MYSQL *mysql)
+ {
+   return (strstr(mysql->server_version, "MariaDB") ||
++          strstr(mysql->server_version, "BrainrotDB") ||
+           strstr(mysql->server_version, "-maria-"));
+ }
+ 
+@@ -4715,6 +4716,8 @@ mysql_get_server_name(MYSQL *mysql)
+   if (mysql->options.extension &&
+       mysql->options.extension->db_driver != NULL)
+     return mysql->options.extension->db_driver->name;
++  if (strstr(mysql->server_version, "BrainrotDB"))
++    return "BrainrotDB";
+   return mariadb_connection(mysql) ? "MariaDB" : "MySQL";
+ }
+ 
