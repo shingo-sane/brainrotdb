@@ -43,7 +43,7 @@ jobs:
           -DPLUGIN_OQGRAPH=NO -DPLUGIN_DUCKDB=NO
 
       - name: Kompilieren (dauert ca. 1 Stunde)
-        run: cmake --build build --config RelWithDebInfo -- -m -v:m
+        run: cmake --build build --config RelWithDebInfo --parallel
 
       - name: Paket zusammenstellen
         shell: pwsh
