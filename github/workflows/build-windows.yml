@@ -1,0 +1,96 @@
+name: BrainrotDB fuer Windows bauen
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  MARIADB_VERSION: "11.8.9"
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 300
+    steps:
+      - name: Git konfigurieren
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - name: Werkzeuge installieren (Bison)
+        run: choco install winflexbison3 -y --no-progress
+
+      - name: MariaDB-Quellcode holen und BrainrotDB-Patch anwenden
+        shell: bash
+        run: |
+          git clone --depth 1 --branch mariadb-$MARIADB_VERSION https://github.com/MariaDB/server.git src
+          cd src
+          git submodule update --init --depth 1 libmariadb extra/wolfssl/wolfssl
+          git apply --whitespace=nowarn ../brainrotdb/patches/brainrotdb-$MARIADB_VERSION.patch
+          cd libmariadb
+          git apply --whitespace=nowarn ../../brainrotdb/patches/brainrotdb-$MARIADB_VERSION-libmariadb.patch
+
+      - name: Konfigurieren
+        run: >
+          cmake -S src -B build -G "Visual Studio 17 2022" -A x64
+          -DWITH_SSL=bundled -DWITH_UNIT_TESTS=OFF -DWITH_MARIABACKUP=OFF -DWITH_WSREP=OFF
+          -DWITH_EMBEDDED_SERVER=OFF -DPLUGIN_ROCKSDB=NO -DPLUGIN_COLUMNSTORE=NO
+          -DPLUGIN_MROONGA=NO -DPLUGIN_SPIDER=NO -DPLUGIN_CONNECT=NO -DPLUGIN_S3=NO
+          -DPLUGIN_OQGRAPH=NO -DPLUGIN_DUCKDB=NO
+
+      - name: Kompilieren (dauert ca. 1 Stunde)
+        run: cmake --build build --config RelWithDebInfo -- -m -v:m
+
+      - name: Paket zusammenstellen
+        shell: pwsh
+        run: |
+          cmake --install build --config RelWithDebInfo --prefix out\BrainrotDB
+          Remove-Item -Recurse -Force out\BrainrotDB\mysql-test, out\BrainrotDB\mariadb-test, out\BrainrotDB\sql-bench, out\BrainrotDB\include -ErrorAction SilentlyContinue
+          Get-ChildItem out\BrainrotDB -Recurse -Include *.pdb, *.lib | Remove-Item -Force
+          Copy-Item brainrotdb\windows\*.bat out\BrainrotDB\
+          Copy-Item brainrotdb\README.md out\BrainrotDB\LIESMICH.md
+          Get-ChildItem out\BrainrotDB\bin | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Testen (alle umbenannten Befehle)
+        shell: pwsh
+        run: |
+          $B = (Resolve-Path out\BrainrotDB).Path
+          & "$B\bin\brainrotdb-install-db.exe" --datadir="$B\data"
+          if ($LASTEXITCODE -ne 0) { throw "install-db fehlgeschlagen" }
+          $srv = Start-Process -FilePath "$B\bin\brainrotdbd.exe" -ArgumentList "--defaults-file=`"$B\data\my.ini`"","--console" -PassThru -NoNewWindow
+          for ($i = 0; $i -lt 60; $i++) {
+            & "$B\bin\brainrotdb-admin.exe" -uroot ping 2>$null
+            if ($LASTEXITCODE -eq 0) { break }
+            Start-Sleep 1
+          }
+          Get-Content brainrotdb\tests\test_brainrot.sql | & "$B\bin\brainrotdb.exe" -uroot --table
+          if ($LASTEXITCODE -ne 0) { throw "BrainrotDB-Test fehlgeschlagen" }
+          & "$B\bin\brainrotdb.exe" -uroot -e "SELECT 1"
+          if ($LASTEXITCODE -eq 0) { throw "SELECT haette nicht funktionieren duerfen" }
+          & "$B\bin\brainrotdb-dump.exe" -uroot --databases schule > dump.sql
+          if ($LASTEXITCODE -ne 0) { throw "Dump fehlgeschlagen" }
+          & "$B\bin\brainrotdb-admin.exe" -uroot shutdown
+          $srv.WaitForExit(60000)
+          Remove-Item -Recurse -Force "$B\data"
+
+      - name: ZIP erstellen
+        shell: pwsh
+        run: Compress-Archive -Path out\BrainrotDB -DestinationPath BrainrotDB-$env:MARIADB_VERSION-windows-x64.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BrainrotDB-windows-x64
+          path: BrainrotDB-${{ env.MARIADB_VERSION }}-windows-x64.zip
+
+      - name: Als Release veroeffentlichen
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=v$MARIADB_VERSION
+          gh release view $TAG >/dev/null 2>&1 || gh release create $TAG --title "BrainrotDB $MARIADB_VERSION" --notes "BrainrotDB $MARIADB_VERSION fuer Windows (64-bit). ZIP entpacken und BrainrotDB-starten.bat doppelklicken."
+          gh release upload $TAG BrainrotDB-$MARIADB_VERSION-windows-x64.zip --clobber
